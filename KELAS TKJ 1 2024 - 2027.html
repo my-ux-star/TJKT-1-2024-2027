@@ -17,8 +17,26 @@
 
 /* SLIDER */
 .slider{position:relative;margin-top:20px;border-radius:20px;overflow:hidden}
-.slide{width:100%;display:none}
-.slide.active{display:block}
+.slider{
+  position:relative;
+  margin-top:20px;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.slide{
+  width:100%;
+  position:absolute;
+  top:0;
+  left:0;
+  opacity:0;
+  transition:opacity 1s ease-in-out;
+}
+
+.slide.active{
+  opacity:1;
+  position:relative;
+}
     .page{display:none;animation:fade .4s ease}
     @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     .anggota{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px}
