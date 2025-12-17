@@ -138,6 +138,39 @@
   border-radius:50%;
   cursor:pointer;
 }
+
+.slider-video{
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.video-slide{
+  position: absolute;
+  top:0; left:0;
+  width: 100%; height: 100%;
+  opacity:0;
+  transition: opacity 0.5s;
+}
+
+.video-slide.active{
+  opacity:1;
+  position:relative;
+}
+
+.prev-btn, .next-btn{
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  border:none;
+  padding:8px 12px;
+  border-radius:50%;
+  cursor:pointer;
+  margin:10px;
+}
+
 </style>
 </head>
 <body>
@@ -371,7 +404,7 @@ const siswa=[
   hobi:'GAMING',
   jabatan:'Anggota',
   foto:'RIFALDI.png',
-  video:'RIFALDI.mp4'},
+  video:'RIFALDI.mp4','RIFALDI2.mp4'},
   {nama:'NAWA AZKIA',
   jk:'P',
   hobi:'',
@@ -475,24 +508,31 @@ function showProfile(s){
     <b>Hobi:</b> ${s.hobi || '-'}
   `;
 
-  /* VIDEO SEPERTI GIF */
-  if(s.video){
-    videoWrap.innerHTML = `
-      <div class="video-wrapper">
-        <video id="profileVideo"
-          class="gif-video"
-          autoplay
-          loop
-          muted
-          playsinline>
-          <source src="${s.video}" type="video/mp4">
-        </video>
-        <button class="mute-btn" onclick="toggleMute(event)">🔇</button>
-      </div>
-    `;
-  } else {
-    videoWrap.innerHTML = '';
-  }
+/* VIDEO SEPERTI GIF (SLIDER) */
+if(s.videos && s.videos.length > 0){
+  let slidesHTML = s.videos.map((v, i) => `
+    <div class="video-slide ${i === 0 ? 'active' : ''}">
+      <video class="gif-video" autoplay loop muted playsinline>
+        <source src="${v}" type="video/mp4">
+      </video>
+      <button class="mute-btn" onclick="toggleMute(event)">🔇</button>
+    </div>
+  `).join('');
+
+  videoWrap.innerHTML = `
+    <div class="slider-video">
+      ${slidesHTML}
+    </div>
+    <button class="prev-btn" onclick="prevVideo()">⬅</button>
+    <button class="next-btn" onclick="nextVideo()">➡</button>
+  `;
+
+  currentVideoIndex = 0;
+  videoSlides = videoWrap.querySelectorAll('.video-slide');
+}
+else {
+  videoWrap.innerHTML = '';
+}
 
   navigate('profile');
 }
@@ -580,6 +620,27 @@ function stopProfileVideo(){
     if(btn) btn.innerText = '🔇';
   }
 };
+
+let currentVideoIndex = 0;
+let videoSlides = [];
+
+function showVideo(index){
+  videoSlides.forEach((slide,i)=>slide.classList.toggle('active',i===index));
+  currentVideoIndex = index;
+}
+
+function nextVideo(){
+  if(!videoSlides) return;
+  let next = (currentVideoIndex + 1) % videoSlides.length;
+  showVideo(next);
+}
+
+function prevVideo(){
+  if(!videoSlides) return;
+  let prev = (currentVideoIndex - 1 + videoSlides.length) % videoSlides.length;
+  showVideo(prev);
+};
+
 </script>
 
 </body>
