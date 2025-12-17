@@ -101,6 +101,23 @@
   cursor:pointer;
 }
 
+.fullscreen{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.9);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+.fullscreen img,
+.fullscreen video{
+  max-width:90%;
+  max-height:90%;
+  border-radius:15px;
+}
+
 </style>
 </head>
 <body>
@@ -192,8 +209,13 @@
 
 <div class="card page" id="profile">
   <div id="profileMedia" class="profile-media"></div>
+
   <h2 id="profileName"></h2>
   <p id="profileInfo"></p>
+
+  <!-- VIDEO DI BAWAH INFO -->
+  <div id="profileVideoWrapper" style="text-align:center;margin-top:20px"></div>
+
   <div class="box" onclick="navigate('anggota')">⬅ Kembali</div>
 </div>
 
@@ -328,7 +350,8 @@ const siswa=[
   jk:'L',
   hobi:'GAMING',
   jabatan:'Anggota',
-  foto:'RIFALDI.png'},
+  foto:'RIFALDI.png',
+  video:'RIFALDI.mp4'},
   {nama:'NAWA AZKIA',
   jk:'P',
   hobi:'',
@@ -413,22 +436,14 @@ function navigate(id){
 
 /* ===== PROFILE ===== */
 function showProfile(s){
-  const media=document.getElementById('profileMedia');
+  const media = document.getElementById('profileMedia');
+  const videoWrap = document.getElementById('profileVideoWrapper');
 
-  if(s.video){
-    media.innerHTML=`
-      <div class="video-wrapper">
-        <video id="profileVideo" autoplay loop muted playsinline>
-          <source src="${s.video}" type="video/mp4">
-        </video>
-        <button class="mute-btn" onclick="toggleMute()">🔇</button>
-      </div>
-    `;
-  }else{
-    media.innerHTML=`
-      <img src="${s.foto ? s.foto : 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}">
-    `;
-  }
+  /* FOTO PROFIL (SELALU FOTO) */
+  media.innerHTML = `
+    <img src="${s.foto ? s.foto : 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
+         onclick="openFullscreen(this)">
+  `;
 
   document.getElementById('profileName').innerText = s.nama;
   document.getElementById('profileInfo').innerHTML = `
@@ -436,6 +451,19 @@ function showProfile(s){
     <b>Jenis Kelamin:</b> ${s.jk}<br>
     <b>Hobi:</b> ${s.hobi || '-'}
   `;
+
+  /* VIDEO DI BAWAH JABATAN */
+  if(s.video){
+    videoWrap.innerHTML = `
+      <div class="video-wrapper">
+        <video id="profileVideo" controls playsinline>
+          <source src="${s.video}" type="video/mp4">
+        </video>
+      </div>
+    `;
+  } else {
+    videoWrap.innerHTML = '';
+  }
 
   navigate('profile');
 }
@@ -486,6 +514,31 @@ window.onload=()=>{
     index=(index+1)%slides.length;
     slides[index].classList.add('active');
   },3000);
+};
+
+function toggleMute(e){
+  e.stopPropagation();
+  const video=document.getElementById('profileVideo');
+  const btn=e.target;
+
+  video.muted=!video.muted;
+  btn.innerText=video.muted?'🔇':'🔊';
+};
+
+function openFullscreen(el){
+  const fs=document.createElement('div');
+  fs.className='fullscreen';
+
+  const clone=el.cloneNode(true);
+  if(clone.tagName==="VIDEO"){
+    clone.muted=el.muted;
+    clone.autoplay=true;
+    clone.controls=true;
+  }
+
+  fs.appendChild(clone);
+  fs.onclick=()=>fs.remove();
+  document.body.appendChild(fs);
 };
 </script>
 
