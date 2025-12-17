@@ -462,7 +462,7 @@ function showProfile(s){
   const media = document.getElementById('profileMedia');
   const videoWrap = document.getElementById('profileVideoWrapper');
 
-  /* FOTO PROFIL (SELALU FOTO) */
+  /* FOTO PROFIL */
   media.innerHTML = `
     <img src="${s.foto ? s.foto : 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
          onclick="openFullscreen(this)">
@@ -475,24 +475,24 @@ function showProfile(s){
     <b>Hobi:</b> ${s.hobi || '-'}
   `;
 
-  /* VIDEO DI BAWAH JABATAN */
+  /* VIDEO SEPERTI GIF */
   if(s.video){
-  videoWrap.innerHTML = `
-    <div class="video-wrapper">
-      <video id="profileVideo"
-        class="gif-video"
-        autoplay
-        loop
-        muted
-        playsinline>
-        <source src="${s.video}" type="video/mp4">
-      </video>
-      <button class="mute-btn" onclick="toggleMute(event)">🔇</button>
-    </div>
-  `;
-} else {
-  videoWrap.innerHTML = '';
-}
+    videoWrap.innerHTML = `
+      <div class="video-wrapper">
+        <video id="profileVideo"
+          class="gif-video"
+          autoplay
+          loop
+          muted
+          playsinline>
+          <source src="${s.video}" type="video/mp4">
+        </video>
+        <button class="mute-btn" onclick="toggleMute(event)">🔇</button>
+      </div>
+    `;
+  } else {
+    videoWrap.innerHTML = '';
+  }
 
   navigate('profile');
 }
@@ -576,7 +576,7 @@ function stopProfileVideo(){
 
   if(video){
     video.muted = true;
-    video.pause();
+    video.play(); // ⬅ penting agar GIF tetap jalan
     if(btn) btn.innerText = '🔇';
   }
 };
