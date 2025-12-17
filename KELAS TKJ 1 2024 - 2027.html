@@ -270,13 +270,14 @@ let siswa = [];
 fetch("https://script.google.com/macros/s/AKfycbx7vJ5i1Y6I2iODKY7Y68PyWnFAJNNP6DWTiCcf4odfKQqLnanq-yNVJX8BxOHvPeTGWg/exec")
   .then(res => res.json())
   .then(data => {
+    console.log(data);
     siswa = data.map(d => ({
-      nama: d["NAMA LENGKAP:"],
+      nama: d["NAMA LENGKAP"],
       jk: d["JENIS KELAMIN"],
       jabatan: d["JABATAN"],
       hobi: d["HOBI"],
-      foto: d["FOTO PROFIL"],
-      video: d["VIDEO"]
+      foto: driveFix(d["FOTO PROFIL"]),
+      video: driveFix(d["VIDEO"])
     }));
 
     loadSiswa();
