@@ -264,33 +264,39 @@
 </footer>
 
 <script>
-/* ===== DATA SISWA (JSON) ===== */
+/* ===== SISWA DARI GOOGLE SHEET ===== */
 let siswa = [];
 
-fetch("https://script.google.com/macros/s/AKfycbx7vJ5i1Y6I2iODKY7Y68PyWnFAJNNP6DWTiCcf4odfKQqLnanq-yNVJX8BxOHvPeTGWg/exec")
+function driveFix(url){
+  if(!url) return '';
+  const id = url.match(/[-\w]{25,}/);
+  return id ? `https://drive.google.com/uc?export=view&id=${id[0]}` : '';
+}
+
+// Ganti URL dengan Apps Script Web App milikmu
+const SCRIPT_URL = "ttps://script.google.com/macros/s/AKfycbx7vJ5i1Y6I2iODKY7Y68PyWnFAJNNP6DWTiCcf4odfKQqLnanq-yNVJX8BxOHvPeTGWg/exec";
+
+fetch(SCRIPT_URL)
   .then(res => res.json())
   .then(data => {
-    console.log(data);
     siswa = data.map(d => ({
-      nama: d["NAMA LENGKAP"],
-      jk: d["JENIS KELAMIN"],
-      jabatan: d["JABATAN"],
-      hobi: d["HOBI"],
-      foto: driveFix(d["FOTO PROFIL"]),
-      video: driveFix(d["VIDEO"])
+      nama: d[Object.keys(d).find(k => k.toLowerCase().includes("NAMA LENGKAP"))] || "-",
+      jk: d[Object.keys(d).find(k => k.toLowerCase().includes("JENIS KELAMIN"))] || "-",
+      jabatan: d[Object.keys(d).find(k => k.toLowerCase().includes("JABATAN"))] || "-",
+      hobi: d[Object.keys(d).find(k => k.toLowerCase().includes("HOBI"))] || "-",
+      foto: driveFix(d[Object.keys(d).find(k => k.toLowerCase().includes("FOTO PROFIL"))]),
+      video: driveFix(d[Object.keys(d).find(k => k.toLowerCase().includes("VIDEO"))])
     }));
 
-    loadSiswa();
+    loadSiswa(); // tampilkan ke halaman
   });
 
 /* ===== NAVIGASI ===== */
 function navigate(id){
-  stopProfileVideo(); // ⬅ AUTO MUTE & PAUSE VIDEO
-
+  stopProfileVideo(); // auto mute & play agar GIF tetap jalan
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   const page=document.getElementById(id);
   if(page) page.style.display='block';
-
   location.hash=id;
   menu.style.display='none';
 }
@@ -300,29 +306,25 @@ function showProfile(s){
   const media = document.getElementById('profileMedia');
   const videoWrap = document.getElementById('profileVideoWrapper');
 
-  /* FOTO PROFIL */
+  // Foto profil
   media.innerHTML = `
-    <img src="${s.foto ? s.foto : 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
+    <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
          onclick="openFullscreen(this)">
   `;
 
+  // Info profil
   document.getElementById('profileName').innerText = s.nama;
   document.getElementById('profileInfo').innerHTML = `
     <b>Jabatan:</b> ${s.jabatan}<br>
     <b>Jenis Kelamin:</b> ${s.jk}<br>
-    <b>Hobi:</b> ${s.hobi || '-'}
+    <b>Hobi:</b> ${s.hobi}
   `;
 
-  /* VIDEO SEPERTI GIF */
+  // Video seperti GIF
   if(s.video){
     videoWrap.innerHTML = `
       <div class="video-wrapper">
-        <video id="profileVideo"
-          class="gif-video"
-          autoplay
-          loop
-          muted
-          playsinline>
+        <video id="profileVideo" class="gif-video" autoplay loop muted playsinline>
           <source src="${s.video}" type="video/mp4">
         </video>
         <button class="mute-btn" onclick="toggleMute(event)">🔇</button>
@@ -337,42 +339,38 @@ function showProfile(s){
 
 /* ===== LOAD SISWA ===== */
 function loadSiswa(){
-  listSiswa.innerHTML='';
+  const list = document.getElementById('listSiswa');
+  list.innerHTML='';
   siswa.forEach(s=>{
-    const div=document.createElement('div');
-    div.className='box';
-    div.innerHTML=`<b>${s.nama}</b><br><small>${s.jabatan}</small>`;
-    div.onclick=()=>showProfile(s);
-    listSiswa.appendChild(div);
-   div.innerHTML = `
-   <img src="${s.foto ? s.foto : 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
-     style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px">
-  <b>${s.nama}</b><br>
-  <small>${s.jabatan}</small>
-`;
+    const div = document.createElement('div');
+    div.className = 'box';
+    div.innerHTML = `
+      <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
+           style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px">
+      <b>${s.nama}</b><br><small>${s.jabatan}</small>
+    `;
+    div.onclick = () => showProfile(s);
+    list.appendChild(div);
   });
-  total.innerText=siswa.length;
-  lk.innerText=siswa.filter(s=>s.jk==='L').length;
-  pr.innerText=siswa.filter(s=>s.jk==='P').length;
+
+  document.getElementById('total').innerText = siswa.length;
+  document.getElementById('lk').innerText = siswa.filter(s=>s.jk==='L').length;
+  document.getElementById('pr').innerText = siswa.filter(s=>s.jk==='P').length;
 }
 
-/* ===== MENU TITIK TIGA (FIX) ===== */
-const menuBtn=document.getElementById('menuBtn');
-const menu=document.getElementById('menu');
-
-menuBtn.addEventListener('click',()=>{
-  menu.style.display=menu.style.display==='block'?'none':'block';
-});
-
+/* ===== MENU TITIK TIGA ===== */
+const menuBtn = document.getElementById('menuBtn');
+const menu = document.getElementById('menu');
+menuBtn.addEventListener('click',()=>menu.style.display = menu.style.display==='block'?'none':'block');
 menu.querySelectorAll('div').forEach(item=>{
   item.addEventListener('click',()=>navigate(item.dataset.page));
 });
 
 /* ===== INIT ===== */
-window.onload=()=>{
+window.onload = ()=>{
   navigate(location.hash.replace('#','')||'beranda');
 
-  /* SLIDER AUTO */
+  // Slider otomatis
   let index=0;
   const slides=document.querySelectorAll('.slide');
   setInterval(()=>{
@@ -382,50 +380,40 @@ window.onload=()=>{
   },3000);
 };
 
+/* ===== VIDEO CONTROLS ===== */
 function toggleMute(e){
   e.stopPropagation();
-  const video=document.getElementById('profileVideo');
-  const btn=e.target;
-
-  video.muted = !video.muted;
-  btn.innerText = video.muted ? '🔇' : '🔊';
-};
-
-function openFullscreen(el){
-  const fs=document.createElement('div');
-  fs.className='fullscreen';
-
-  const clone=el.cloneNode(true);
-  if(clone.tagName==="VIDEO"){
-    clone.muted=el.muted;
-    clone.autoplay=true;
-    clone.controls=true;
+  const video = document.getElementById('profileVideo');
+  const btn = e.target;
+  if(video){
+    video.muted = !video.muted;
+    btn.innerText = video.muted?'🔇':'🔊';
   }
-
-  fs.appendChild(clone);
-  fs.onclick=()=>fs.remove();
-  document.body.appendChild(fs);
-};
+}
 
 function stopProfileVideo(){
   const video = document.getElementById('profileVideo');
   const btn = document.querySelector('.mute-btn');
-
   if(video){
     video.muted = true;
-    video.play(); // ⬅ penting agar GIF tetap jalan
-    if(btn) btn.innerText = '🔇';
+    video.play(); // biar GIF tetap jalan
+    if(btn) btn.innerText='🔇';
   }
-};
+}
 
-function driveFix(url){
-  if(!url) return '';
-  const id = url.match(/[-\w]{25,}/);
-  return id
-    ? `https://drive.google.com/uc?export=view&id=${id[0]}`
-    : '';
+function openFullscreen(el){
+  const fs = document.createElement('div');
+  fs.className = 'fullscreen';
+  const clone = el.cloneNode(true);
+  if(clone.tagName==="VIDEO"){
+    clone.muted = el.muted;
+    clone.autoplay = true;
+    clone.controls = true;
+  }
+  fs.appendChild(clone);
+  fs.onclick = ()=>fs.remove();
+  document.body.appendChild(fs);
 };
-
 </script>
 
 </body>
