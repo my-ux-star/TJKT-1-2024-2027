@@ -118,6 +118,26 @@
   border-radius:15px;
 }
 
+.gif-video{
+  width:260px;
+  height:260px;
+  border-radius:20px;
+  object-fit:cover;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+
+.mute-btn{
+  position:absolute;
+  bottom:12px;
+  right:12px;
+  background:rgba(0,0,0,.6);
+  border:none;
+  color:#fff;
+  font-size:18px;
+  padding:8px 12px;
+  border-radius:50%;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -454,16 +474,22 @@ function showProfile(s){
 
   /* VIDEO DI BAWAH JABATAN */
   if(s.video){
-    videoWrap.innerHTML = `
-      <div class="video-wrapper">
-        <video id="profileVideo" controls playsinline>
-          <source src="${s.video}" type="video/mp4">
-        </video>
-      </div>
-    `;
-  } else {
-    videoWrap.innerHTML = '';
-  }
+  videoWrap.innerHTML = `
+    <div class="video-wrapper">
+      <video id="profileVideo"
+        class="gif-video"
+        autoplay
+        loop
+        muted
+        playsinline>
+        <source src="${s.video}" type="video/mp4">
+      </video>
+      <button class="mute-btn" onclick="toggleMute(event)">🔇</button>
+    </div>
+  `;
+} else {
+  videoWrap.innerHTML = '';
+}
 
   navigate('profile');
 }
@@ -521,8 +547,8 @@ function toggleMute(e){
   const video=document.getElementById('profileVideo');
   const btn=e.target;
 
-  video.muted=!video.muted;
-  btn.innerText=video.muted?'🔇':'🔊';
+  video.muted = !video.muted;
+  btn.innerText = video.muted ? '🔇' : '🔊';
 };
 
 function openFullscreen(el){
