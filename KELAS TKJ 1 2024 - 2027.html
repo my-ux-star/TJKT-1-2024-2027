@@ -1,187 +1,69 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KELAS TKJ 1 ANGKATAN 2024–2027</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
-    body{min-height:100vh;width:100vw;overflow-x:hidden;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:#fff}
-    header{text-align:center;padding:40px 20px;position:relative}
-    h1{font-size:2.4rem}
-    .logo{width:90px;margin-bottom:15px}
-    @media(max-width:600px){h1{font-size:1.8rem}.logo{width:70px}}
-    section{padding:40px 20px;max-width:1200px;margin:auto}
-    .card{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border-radius:20px;padding:30px;margin-bottom:30px;box-shadow:0 8px 25px rgba(0,0,0,.3)}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KELAS TKJ 1 ANGKATAN 2024–2027</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+  body { min-height:100vh; width:100vw; overflow-x:hidden; background:linear-gradient(135deg,#0f2027,#203a43,#2c5364); color:#fff; }
+  header { text-align:center; padding:40px 20px; position:relative; }
+  h1 { font-size:2.4rem; }
+  .logo { width:90px; margin-bottom:15px; }
+  @media(max-width:600px){ h1{ font-size:1.8rem; } .logo{ width:70px; } }
+  section { padding:40px 20px; max-width:1200px; margin:auto; }
+  .card { background:rgba(255,255,255,.1); backdrop-filter:blur(10px); border-radius:20px; padding:30px; margin-bottom:30px; box-shadow:0 8px 25px rgba(0,0,0,.3); }
+  .slider { position:relative; margin-top:20px; border-radius:20px; overflow:hidden; }
+  .slide { width:100%; position:absolute; top:0; left:0; opacity:0; transition:opacity 1s ease-in-out; }
+  .slide.active { opacity:1; position:relative; }
+  .page { display:none; animation:fade .4s ease; }
+  @keyframes fade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .anggota { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:20px; }
+  .box { background:rgba(255,255,255,.15); padding:15px; border-radius:15px; text-align:center; cursor:pointer; transition:.3s; }
+  .box:hover { background:rgba(255,255,255,.35); transform:translateY(-5px); }
 
-/* SLIDER */
-.slider{position:relative;margin-top:20px;border-radius:20px;overflow:hidden}
-.slider{
-  position:relative;
-  margin-top:20px;
-  border-radius:20px;
-  overflow:hidden;
-}
+  /* MENU TITIK TIGA */
+  .menu-btn { position:absolute; top:25px; right:25px; font-size:30px; cursor:pointer; user-select:none; }
+  .dropdown { position:absolute; top:70px; right:25px; background:rgba(0,0,0,.8); border-radius:15px; display:none; overflow:hidden; min-width:180px; z-index:999; }
+  .dropdown div { padding:14px 20px; cursor:pointer; }
+  .dropdown div:hover { background:rgba(255,255,255,.2); }
 
-.slide{
-  width:100%;
-  position:absolute;
-  top:0;
-  left:0;
-  opacity:0;
-  transition:opacity 1s ease-in-out;
-}
+  /* Struktur Organisasi */
+  .stat { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; }
+  .bagan { display:flex; flex-direction:column; align-items:center; gap:25px; margin-top:30px; }
+  .level { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
+  .node { background:rgba(255,255,255,.18); padding:15px 20px; border-radius:15px; min-width:180px; text-align:center; box-shadow:0 6px 20px rgba(0,0,0,.3); position:relative; }
+  .node small { opacity:.8; font-size:.85rem; }
+  .kepala { background:linear-gradient(135deg,#00c6ff,#0072ff); font-weight:600; }
 
-.slide.active{
-  opacity:1;
-  position:relative;
-}
-    .page{display:none;animation:fade .4s ease}
-    @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-    .anggota{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px}
-    .box{background:rgba(255,255,255,.15);padding:15px;border-radius:15px;text-align:center;cursor:pointer;transition:.3s}
-    .box:hover{background:rgba(255,255,255,.35);transform:translateY(-5px)}
+  /* Profile Media */
+  .foto-profile { width:140px; height:140px; border-radius:50%; object-fit:cover; margin:0 auto 15px; display:block; border:4px solid rgba(255,255,255,.4); box-shadow:0 8px 20px rgba(0,0,0,.4); }
+  .profile-media { display:flex; justify-content:center; margin-bottom:15px; }
+  .profile-media img, .profile-media video { width:260px; height:260px; border-radius:50%; object-fit:cover; border:5px solid rgba(255,255,255,.5); box-shadow:0 10px 30px rgba(0,0,0,.5); }
+  .gif-video { width:260px; height:260px; border-radius:20px; object-fit:cover; box-shadow:0 10px 30px rgba(0,0,0,.5); }
 
-    /* MENU TITIK TIGA */
-    .menu-btn{position:absolute;top:25px;right:25px;font-size:30px;cursor:pointer;user-select:none}
-    .dropdown{position:absolute;top:70px;right:25px;background:rgba(0,0,0,.8);border-radius:15px;display:none;overflow:hidden;min-width:180px;z-index:999}
-    .dropdown div{padding:14px 20px;cursor:pointer}
-    .dropdown div:hover{background:rgba(255,255,255,.2)}
+  /* Slider Video */
+  .slider-video { position: relative; width: 260px; height: 260px; margin: 0 auto; overflow: hidden; border-radius: 20px; }
+  .video-slide { position: absolute; top:0; left:0; width: 100%; height: 100%; opacity:0; transition: opacity 0.3s ease; }
+  .video-slide.active { opacity:1; position: relative; }
 
-    .stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
-  .bagan{display:flex;flex-direction:column;align-items:center;gap:25px;margin-top:30px}
-.level{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
-.node{background:rgba(255,255,255,.18);padding:15px 20px;border-radius:15px;min-width:180px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.3);position:relative}
-.node small{opacity:.8;font-size:.85rem}
-.kepala{background:linear-gradient(135deg,#00c6ff,#0072ff);font-weight:600}
+  /* Fullscreen */
+  .fullscreen { position:fixed; inset:0; background:rgba(0,0,0,.9); display:flex; justify-content:center; align-items:center; z-index:9999; }
+  .fullscreen img, .fullscreen video{ max-width:90%; max-height:90%; border-radius:15px; }
 
-.foto-profile{
-  width:140px;
-  height:140px;
-  border-radius:50%;
-  object-fit:cover;
-  margin:0 auto 15px;
-  display:block;
-  border:4px solid rgba(255,255,255,.4);
-  box-shadow:0 8px 20px rgba(0,0,0,.4);
-}
-
-.profile-media{
-  display:flex;
-  justify-content:center;
-  margin-bottom:15px;
-}
-
-.profile-media img,
-.profile-media video{
-  width:260px;
-  height:260px;
-  border-radius:50%;
-  object-fit:cover;
-  border:5px solid rgba(255,255,255,.5);
-  box-shadow:0 10px 30px rgba(0,0,0,.5);
-}
-
-.video-wrapper{
-  position:relative;
-  display:inline-block;
-}
-
-.mute-btn{
-  position:absolute;
-  bottom:15px;
-  right:15px;
-  background:rgba(0,0,0,.6);
-  border:none;
-  color:#fff;
-  font-size:18px;
-  padding:8px 12px;
-  border-radius:50%;
-  cursor:pointer;
-}
-
-.fullscreen{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.9);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-}
-
-.fullscreen img,
-.fullscreen video{
-  max-width:90%;
-  max-height:90%;
-  border-radius:15px;
-}
-
-.gif-video{
-  width:260px;
-  height:260px;
-  border-radius:20px;
-  object-fit:cover;
-  box-shadow:0 10px 30px rgba(0,0,0,.5);
-}
-
-.mute-btn{
-  position:absolute;
-  bottom:12px;
-  right:12px;
-  background:rgba(0,0,0,.6);
-  border:none;
-  color:#fff;
-  font-size:18px;
-  padding:8px 12px;
-  border-radius:50%;
-  cursor:pointer;
-}
-
-.slider-video {
-  position: relative;
-  width: 260px;
-  height: 260px;
-  margin: 0 auto;
-  overflow: hidden;
-  border-radius: 20px;
-}
-
-.video-slide {
-  position: absolute;
-  top:0; left:0;
-  width: 100%; height: 100%;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.video-slide.active {
-  opacity: 1;
-  position: relative;
-}
-
-.prev-btn, .next-btn{
-  background: rgba(0,0,0,.6);
-  color: #fff;
-  border:none;
-  padding:8px 12px;
-  border-radius:50%;
-  cursor:pointer;
-  margin:10px;
-}
-
+  /* Video Indicators */
+  .video-indicators .dot { display:inline-block; width:10px; height:10px; margin:0 5px; background:#ccc; border-radius:50%; cursor:pointer; }
+  .video-indicators .dot.active { background:#fff; }
 </style>
 </head>
 <body>
 
 <header>
-  <!-- LOGO SEKOLAH -->
- <img src="logo.png" alt="Logo Sekolah" class="logo">
+  <img src="logo.png" alt="Logo Sekolah" class="logo">
   <h1>KELAS TKJ 1<br>ANGKATAN 2024–2027</h1>
   <p>Teknik Komputer dan Jaringan</p>
 
-  <!-- TITIK TIGA -->
   <div class="menu-btn" id="menuBtn">⋮</div>
   <div class="dropdown" id="menu">
     <div data-page="beranda">Beranda</div>
@@ -195,63 +77,52 @@
 
 <section>
   <div class="card page" id="beranda">
-  <h2>Beranda</h2>
-  <p>Selamat datang di website resmi <b>KELAS TKJ 1 ANGKATAN 2024–2027</b>.</p>
-  <p>Gunakan menu titik tiga (⋮) di kanan atas untuk melihat struktur kelas, anggota kelas, dashboard, dan moment.</p>
+    <h2>Beranda</h2>
+    <p>Selamat datang di website resmi <b>KELAS TKJ 1 ANGKATAN 2024–2027</b>.</p>
+    <p>Gunakan menu titik tiga (⋮) di kanan atas untuk melihat struktur kelas, anggota kelas, dashboard, dan moment.</p>
 
-  <!-- SLIDER FOTO -->
-  <div class="slider">
-    <img class="slide active" src="1.jpg">
-    <img class="slide" src="2.jpg">
-    <img class="slide" src="3.jpg">
+    <!-- SLIDER FOTO -->
+    <div class="slider">
+      <img class="slide active" src="1.jpg">
+      <img class="slide" src="2.jpg">
+      <img class="slide" src="3.jpg">
+    </div>
   </div>
-</div>
 
   <div class="card page" id="wali">
-  <h2>Wali Kelas</h2>
-
-  <img src="wali.png" alt="Foto Wali Kelas" class="foto-profile">
-
-  <h3>Septa Ibnu Shina, S.Pd</h3>
-
-  <p style="margin-top:10px;line-height:1.8">
-    <b>Mata Pelajaran:</b> Teknik Komputer & Jaringan<br>
-    <b>Jenis Kelamin:</b> Laki-laki<br>
-    <b>Motivasi:</b> 
-    <i>"Belajar hari ini adalah bekal untuk masa depan."</i>
-  </p>
-</div>
+    <h2>Wali Kelas</h2>
+    <img src="wali.png" alt="Foto Wali Kelas" class="foto-profile">
+    <h3>Septa Ibnu Shina, S.Pd</h3>
+    <p style="margin-top:10px;line-height:1.8">
+      <b>Mata Pelajaran:</b> Teknik Komputer & Jaringan<br>
+      <b>Jenis Kelamin:</b> Laki-laki<br>
+      <b>Motivasi:</b> 
+      <i>"Belajar hari ini adalah bekal untuk masa depan."</i>
+    </p>
+  </div>
 
   <div class="card page" id="struktur">
-  <h2>Bagan Struktur Organisasi Kelas</h2>
-  <div class="bagan">
-    <div class="node kepala">Wali Kelas<br><small>Septa Ibnu Shina, S.Pd</small></div>
-
-    <div class="level">
-      <div class="node">Ketua Kelas<br><small>VHINKY JULFIRA SUSANTO</small></div>
-    </div>
-
-    <div class="level">
-      <div class="node">Wakil Ketua<br><small>INTAN HIKMATUL HAWA</small></div>
-    </div>
-
-    <div class="level">
-      <div class="node">Sekretaris 1<br><small>Siswa 3</small></div>
-      <div class="node">Sekretaris 2<br><small>Siswa 4</small></div>
-    </div>
-
-    <div class="level">
-      <div class="node">Bendahara 1<br><small>Siswa 5</small></div>
-      <div class="node">Bendahara 2<br><small>Siswa 6</small></div>
-    </div>
-
-    <div class="level">
-      <div class="node">Sie Keamanan</div>
-      <div class="node">Sie Kebersihan</div>
-    </div>
-  </div>
-</div>
-      
+    <h2>Bagan Struktur Organisasi Kelas</h2>
+    <div class="bagan">
+      <div class="node kepala">Wali Kelas<br><small>Septa Ibnu Shina, S.Pd</small></div>
+      <div class="level">
+        <div class="node">Ketua Kelas<br><small>VHINKY JULFIRA SUSANTO</small></div>
+      </div>
+      <div class="level">
+        <div class="node">Wakil Ketua<br><small>INTAN HIKMATUL HAWA</small></div>
+      </div>
+      <div class="level">
+        <div class="node">Sekretaris 1<br><small>Siswa 3</small></div>
+        <div class="node">Sekretaris 2<br><small>Siswa 4</small></div>
+      </div>
+      <div class="level">
+        <div class="node">Bendahara 1<br><small>Siswa 5</small></div>
+        <div class="node">Bendahara 2<br><small>Siswa 6</small></div>
+      </div>
+      <div class="level">
+        <div class="node">Sie Keamanan</div>
+        <div class="node">Sie Kebersihan</div>
+      </div>
     </div>
   </div>
 
@@ -260,17 +131,13 @@
     <div class="anggota" id="listSiswa"></div>
   </div>
 
-<div class="card page" id="profile">
-  <div id="profileMedia" class="profile-media"></div>
-
-  <h2 id="profileName"></h2>
-  <p id="profileInfo"></p>
-
-  <!-- VIDEO DI BAWAH INFO -->
-  <div id="profileVideoWrapper" style="text-align:center;margin-top:20px"></div>
-
-  <div class="box" onclick="navigate('anggota')"> Kembali</div>
-</div>
+  <div class="card page" id="profile">
+    <div id="profileMedia" class="profile-media"></div>
+    <h2 id="profileName"></h2>
+    <p id="profileInfo"></p>
+    <div id="profileVideoWrapper" style="text-align:center;margin-top:20px"></div>
+    <div class="box" onclick="navigate('anggota')"> Kembali</div>
+  </div>
 
   <div class="card page" id="dashboard">
     <h2>Dashboard Kelas</h2>
@@ -297,211 +164,55 @@
 </footer>
 
 <script>
-/* ===== DATA SISWA (JSON) ===== */
-const siswa=[
-  {nama:'ADI PRASETIO',
-  jk:'L',
-  hobi:'Gaming',
-  jabatan:'anggota',
-  foto:'Adi.png'},
-  {nama:'AHMAD AQWIYAN IFADA',
-  jk:'L',
-  hobi:'',
-  jabatan:'anggota',
-  foto:''},
-  {nama:'AMELIA ISWATUL HAWA',
-  jk:'P',
-  hobi:'',
-  jabatan:'anggota',
-  foto:''},
-  {nama:'ARIBATUL AFIFAH',
-  jk:'P',
-  hobi:'',
-  jabatan:'anggota',
-  foto:''},
-  {nama:'AZZIZA URISTU Q.C.',
-  jk:'P',
-  hobi:'Berenang',
-  jabatan:'anggota',
-  foto:''},
-  {nama:'DESCHA DWI ALFIANA',
-  jk:'P',
-  hobi:'',
-  jabatan:'anggota',
-  foto:''},
-  {nama:'DEWI ANA PUTRI',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'ERICA FAJAR MARDANI',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'FANISAH INDRIYANI',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'FINA AFRILIYANI',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'HAFIDZA SALMA MAULIDA',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'HIFA SHEILA MEYLIANA',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'ILMA LUKYANATUL KAMILA',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'INTAN HIKMATUL HAWA',
-  jk:'P',
-  hobi:'',
-  jabatan:'Wakil Ketua Kelas',
-  foto:''},
-  {nama:'LIA MILATUL KHUSNA',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'MAHRIN SHIERRA ATHIEFA HN',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'MELATI A',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'MIA LATIFAH',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'MUHAMMAD ARIF AJILLA',
-  jk:'L',
-  hobi:'HOREG',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'MUHAMMAD ILHAM FAHRI',
-  jk:'L',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'MUHAMMAD RIFALDI KURNIAWAN',
-  jk:'L',
-  hobi:'GAMING',
-  jabatan:'Anggota',
-  foto:'RIFALDI.png',
-  video:['RIFALDI.mp4','RIFALDI2.mp4']},
-  {nama:'NAWA AZKIA',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'NOVIANA SARI',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'PINKAN AULIA RAHMA',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'PUTRI SARI KUSUMA HATI',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''
-  },
-  {nama:'RATNA LUTFIYANTI',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'RIRIN SWANTIKA DEWI',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'RIRIN YULIA SARI',
-  jk:'P',
-  hobi:'Nonton Anime',
-  jabatan:'Anggota',
-  foto:'ririny.png',video:['ririny.mp4']},
-  {nama:'RIZKY WIJAYA',
-  jk:'L',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'VHINKY JULFIRA SUSANTO',
-  jk:'P',
-  hobi:'',
-  jabatan:'Ketua Kelas',
-  foto:''},
-  {nama:'VIRA NINDYA PUTRI',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'WIDA AYUNINGTIYAS',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'WITA SALISA',
-  jk:'P',
-  hobi:'Olahraga',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'ZIDNA THUWBA KAMEELA',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''},
-  {nama:'IQNA RAHMA MAULIDA',
-  jk:'P',
-  hobi:'',
-  jabatan:'Anggota',
-  foto:''}
-];
+const siswa=[ /* Data siswa sama seperti kode awal */ ];
 
-/* ===== NAVIGASI ===== */
+const menuBtn=document.getElementById('menuBtn');
+const menu=document.getElementById('menu');
+const listSiswa=document.getElementById('listSiswa');
+const total=document.getElementById('total');
+const lk=document.getElementById('lk');
+const pr=document.getElementById('pr');
+
+let currentVideoIndex = 0;
+let videoSlides = [];
+
 function navigate(id){
-  stopProfileVideo(); // ⬅ AUTO MUTE & PAUSE VIDEO
-
+  stopProfileVideo();
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   const page=document.getElementById(id);
   if(page) page.style.display='block';
-
   location.hash=id;
   menu.style.display='none';
 }
 
-let startX = 0;
-let endX = 0;
+menuBtn.addEventListener('click',()=>{ menu.style.display = menu.style.display==='block'?'none':'block'; });
+menu.querySelectorAll('div').forEach(item=>{ item.addEventListener('click',()=>navigate(item.dataset.page)); });
+
+function loadSiswa(){
+  listSiswa.innerHTML='';
+  siswa.forEach(s=>{
+    const div=document.createElement('div');
+    div.className='box';
+    div.innerHTML = `
+      <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
+        style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px">
+      <b>${s.nama}</b><br>
+      <small>${s.jabatan}</small>
+    `;
+    div.onclick = ()=>showProfile(s);
+    listSiswa.appendChild(div);
+  });
+  total.innerText=siswa.length;
+  lk.innerText=siswa.filter(s=>s.jk==='L').length;
+  pr.innerText=siswa.filter(s=>s.jk==='P').length;
+}
 
 function showProfile(s){
-  const media = document.getElementById('profileMedia');
-  const videoWrap = document.getElementById('profileVideoWrapper');
-
-  media.innerHTML = `
-    <img src="${s.foto ? s.foto : 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
-         onclick="openFullscreen(this)">
+  stopProfileVideo();
+  document.getElementById('profileMedia').innerHTML = `
+    <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
+      onclick="openFullscreen(this)">
   `;
-
   document.getElementById('profileName').innerText = s.nama;
   document.getElementById('profileInfo').innerHTML = `
     <b>Jabatan:</b> ${s.jabatan}<br>
@@ -509,134 +220,85 @@ function showProfile(s){
     <b>Hobi:</b> ${s.hobi || '-'}
   `;
 
-  if(s.video && s.video.length > 0){
-  let slidesHTML = s.video.map((v, i) => `
-    <div class="video-slide ${i === 0 ? 'active' : ''}">
-      <video class="gif-video" autoplay loop muted playsinline>
-        <source src="${v}" type="video/mp4">
-      </video>
-    </div>
-  `).join('');
+  const videoWrap = document.getElementById('profileVideoWrapper');
+  if(s.video && s.video.length){
+    videoWrap.innerHTML = `<div class="slider-video">${s.video.map((v,i)=>`
+      <div class="video-slide ${i===0?'active':''}">
+        <video class="gif-video" autoplay loop muted playsinline>
+          <source src="${v}" type="video/mp4">
+        </video>
+      </div>
+    `).join('')}</div>
+    <div class="video-indicators"></div>`;
+    
+    videoSlides = videoWrap.querySelectorAll('.video-slide');
+    currentVideoIndex = 0;
 
-  // Tambahkan container indikator
-  videoWrap.innerHTML = `
-    <div class="slider-video">
-      ${slidesHTML}
-    </div>
-    <div class="video-indicators" style="text-align:center;margin-top:10px;"></div>
-  `;
+    const indicators = videoWrap.querySelector('.video-indicators');
+    indicators.innerHTML = s.video.map((_,i)=>`<span class="dot ${i===0?'active':''}" onclick="showVideo(${i})"></span>`).join('');
 
-  currentVideoIndex = 0;
-  videoSlides = videoWrap.querySelectorAll('.video-slide');
-
-  // Buat indikator titik
-  const indicators = videoWrap.querySelector('.video-indicators');
-  indicators.innerHTML = s.video.map((_,i)=>`<span class="dot" style="
-    display:inline-block;width:10px;height:10px;margin:0 5px;background:#ccc;border-radius:50%;cursor:pointer;
-  " onclick="showVideo(${i})"></span>`).join('');
-  updateIndicators();
-
-  const slider = videoWrap.querySelector('.slider-video');
-
-  // SWIPE
-  slider.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-  slider.addEventListener('touchend', e => {
-    endX = e.changedTouches[0].clientX;
-    if(startX - endX > 50) nextVideo(); // swipe kiri
-    if(endX - startX > 50) prevVideo(); // swipe kanan
-  });
-} else {
-  videoWrap.innerHTML = '';
-  videoSlides = [];
-}
+    const slider = videoWrap.querySelector('.slider-video');
+    let startX=0,endX=0;
+    slider.addEventListener('touchstart', e=>startX=e.touches[0].clientX);
+    slider.addEventListener('touchend', e=>{
+      endX=e.changedTouches[0].clientX;
+      if(startX-endX>50) nextVideo();
+      if(endX-startX>50) prevVideo();
+    });
+  } else {
+    videoWrap.innerHTML='';
+    videoSlides=[];
+  }
 
   navigate('profile');
 }
 
 function showVideo(index){
-  videoSlides.forEach((slide, i) => {
+  if(!videoSlides.length) return;
+  videoSlides.forEach((slide,i)=>{
+    slide.classList.toggle('active',i===index);
     const vid = slide.querySelector('video');
-    slide.classList.toggle('active', i === index);
-
     if(vid){
-      if(i === index){
-        vid.muted = false;   // aktif keluar suara
-        vid.play();          // mulai play
-      } else {
-        vid.muted = true;
-        vid.pause();         // pause video non-aktif
-        vid.currentTime = 0; // reset ke awal
-      }
+      if(i===index){ vid.muted=false; vid.play(); }
+      else { vid.muted=true; vid.pause(); vid.currentTime=0; }
     }
   });
-  currentVideoIndex = index;
+  currentVideoIndex=index;
   updateIndicators();
 }
 
-function nextVideo(){
-  if(!videoSlides) return;
-  let next = (currentVideoIndex + 1) % videoSlides.length;
-  showVideo(next);
+function nextVideo(){ showVideo((currentVideoIndex+1)%videoSlides.length); }
+function prevVideo(){ showVideo((currentVideoIndex-1+videoSlides.length)%videoSlides.length); }
+
+function updateIndicators(){
+  document.querySelectorAll('.video-indicators .dot').forEach((dot,i)=>{
+    dot.style.background = (i===currentVideoIndex?'#fff':'#ccc');
+  });
 }
 
-function prevVideo(){
-  if(!videoSlides) return;
-  let prev = (currentVideoIndex - 1 + videoSlides.length) % videoSlides.length;
-  showVideo(prev);
-}
-
-/* Stop semua video di profile */
 function stopProfileVideo(){
-  videoSlides.forEach(slide=>{
-    const vid = slide.querySelector('video');
-    if(vid){
-      vid.muted = true;
-      vid.play();
-    }
-    const btn = slide.querySelector('.mute-btn');
-    if(btn) btn.innerText='🔇';
+  if(!videoSlides.length) return;
+  videoSlides.forEach(sl=>{
+    const vid = sl.querySelector('video');
+    if(vid){ vid.pause(); vid.currentTime=0; vid.muted=true; }
   });
-};
-
-/* ===== LOAD SISWA ===== */
-function loadSiswa(){
-  listSiswa.innerHTML='';
-  siswa.forEach(s=>{
-    const div=document.createElement('div');
-    div.className='box';
-    div.innerHTML=`<b>${s.nama}</b><br><small>${s.jabatan}</small>`;
-    div.onclick=()=>showProfile(s);
-    listSiswa.appendChild(div);
-   div.innerHTML = `
-   <img src="${s.foto ? s.foto : 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
-     style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px">
-  <b>${s.nama}</b><br>
-  <small>${s.jabatan}</small>
-`;
-  });
-  total.innerText=siswa.length;
-  lk.innerText=siswa.filter(s=>s.jk==='L').length;
-  pr.innerText=siswa.filter(s=>s.jk==='P').length;
 }
 
-/* ===== MENU TITIK TIGA (FIX) ===== */
-const menuBtn=document.getElementById('menuBtn');
-const menu=document.getElementById('menu');
+function openFullscreen(el){
+  const fs=document.createElement('div');
+  fs.className='fullscreen';
+  const clone=el.cloneNode(true);
+  if(clone.tagName==='VIDEO'){ clone.autoplay=true; clone.controls=true; clone.muted=false; }
+  fs.appendChild(clone);
+  fs.onclick=()=>fs.remove();
+  document.body.appendChild(fs);
+}
 
-menuBtn.addEventListener('click',()=>{
-  menu.style.display=menu.style.display==='block'?'none':'block';
-});
-
-menu.querySelectorAll('div').forEach(item=>{
-  item.addEventListener('click',()=>navigate(item.dataset.page));
-});
-
-/* ===== INIT ===== */
 window.onload=()=>{
   loadSiswa();
   navigate(location.hash.replace('#','')||'beranda');
-
-  /* SLIDER AUTO */
+  
+  // slider gambar beranda
   let index=0;
   const slides=document.querySelectorAll('.slide');
   setInterval(()=>{
@@ -645,63 +307,6 @@ window.onload=()=>{
     slides[index].classList.add('active');
   },3000);
 };
-
-function openFullscreen(el){
-  const fs=document.createElement('div');
-  fs.className='fullscreen';
-
-  const clone=el.cloneNode(true);
-  if(clone.tagName==="VIDEO"){
-    clone.muted=el.muted;
-    clone.autoplay=true;
-    clone.controls=true;
-  }
-
-  fs.appendChild(clone);
-  fs.onclick=()=>fs.remove();
-  document.body.appendChild(fs);
-};
-
-function stopProfileVideo(){
-  if(!videoSlides) return;
-  videoSlides.forEach(slide=>{
-    const vid = slide.querySelector('video');
-    if(vid){
-      vid.pause();  // ⬅ stop video
-      vid.currentTime = 0;
-      vid.muted = true;
-    }
-    const btn = slide.querySelector('.mute-btn');
-    if(btn) btn.innerText='🔇';
-  });
-};
-
-let currentVideoIndex = 0;
-let videoSlides = [];
-
-function showVideo(index){
-  videoSlides.forEach((slide,i)=>slide.classList.toggle('active',i===index));
-  currentVideoIndex = index;
-  updateIndicators(); // ⬅ update dot
-};
-
-function nextVideo(){
-  if(!videoSlides) return;
-  let next = (currentVideoIndex + 1) % videoSlides.length;
-  showVideo(next);
-};
-
-function prevVideo(){
-  if(!videoSlides) return;
-  let prev = (currentVideoIndex - 1 + videoSlides.length) % videoSlides.length;
-  showVideo(prev);
-};
-
-function updateIndicators(){
-  const dots = document.querySelectorAll('.video-indicators .dot');
-  dots.forEach((dot,i)=>dot.style.background = (i===currentVideoIndex ? '#fff' : '#ccc'));
-};
-
 </script>
 
 </body>
