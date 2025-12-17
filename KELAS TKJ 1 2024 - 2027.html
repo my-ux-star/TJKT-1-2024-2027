@@ -519,10 +519,23 @@ function showProfile(s){
     </div>
   `).join('');
 
-  videoWrap.innerHTML = `<div class="slider-video">${slidesHTML}</div>`;
+  // Tambahkan container indikator
+  videoWrap.innerHTML = `
+    <div class="slider-video">
+      ${slidesHTML}
+    </div>
+    <div class="video-indicators" style="text-align:center;margin-top:10px;"></div>
+  `;
 
   currentVideoIndex = 0;
   videoSlides = videoWrap.querySelectorAll('.video-slide');
+
+  // Buat indikator titik
+  const indicators = videoWrap.querySelector('.video-indicators');
+  indicators.innerHTML = s.video.map((_,i)=>`<span class="dot" style="
+    display:inline-block;width:10px;height:10px;margin:0 5px;background:#ccc;border-radius:50%;cursor:pointer;
+  " onclick="showVideo(${i})"></span>`).join('');
+  updateIndicators();
 
   const slider = videoWrap.querySelector('.slider-video');
 
@@ -655,14 +668,17 @@ function openFullscreen(el){
 };
 
 function stopProfileVideo(){
-  const video = document.getElementById('profileVideo');
-  const btn = document.querySelector('.mute-btn');
-
-  if(video){
-    video.muted = true;
-    video.play(); // ⬅ penting agar GIF tetap jalan
-    if(btn) btn.innerText = '🔇';
-  }
+  if(!videoSlides) return;
+  videoSlides.forEach(slide=>{
+    const vid = slide.querySelector('video');
+    if(vid){
+      vid.pause();  // ⬅ stop video
+      vid.currentTime = 0;
+      vid.muted = true;
+    }
+    const btn = slide.querySelector('.mute-btn');
+    if(btn) btn.innerText='🔇';
+  });
 };
 
 let currentVideoIndex = 0;
@@ -671,18 +687,24 @@ let videoSlides = [];
 function showVideo(index){
   videoSlides.forEach((slide,i)=>slide.classList.toggle('active',i===index));
   currentVideoIndex = index;
-}
+  updateIndicators(); // ⬅ update dot
+};
 
 function nextVideo(){
   if(!videoSlides) return;
   let next = (currentVideoIndex + 1) % videoSlides.length;
   showVideo(next);
-}
+};
 
 function prevVideo(){
   if(!videoSlides) return;
   let prev = (currentVideoIndex - 1 + videoSlides.length) % videoSlides.length;
   showVideo(prev);
+};
+
+function updateIndicators(){
+  const dots = document.querySelectorAll('.video-indicators .dot');
+  dots.forEach((dot,i)=>dot.style.background = (i===currentVideoIndex ? '#fff' : '#ccc'));
 };
 
 </script>
