@@ -515,7 +515,6 @@ function showProfile(s){
       <video class="gif-video" autoplay loop muted playsinline>
         <source src="${v}" type="video/mp4">
       </video>
-      <button class="mute-btn" onclick="toggleMuteVideo(event)">🔇</button>
     </div>
   `).join('');
 
@@ -555,8 +554,23 @@ function showProfile(s){
 }
 
 function showVideo(index){
-  videoSlides.forEach((slide,i)=>slide.classList.toggle('active',i===index));
+  videoSlides.forEach((slide, i) => {
+    const vid = slide.querySelector('video');
+    slide.classList.toggle('active', i === index);
+
+    if(vid){
+      if(i === index){
+        vid.muted = false;   // aktif keluar suara
+        vid.play();          // mulai play
+      } else {
+        vid.muted = true;
+        vid.pause();         // pause video non-aktif
+        vid.currentTime = 0; // reset ke awal
+      }
+    }
+  });
   currentVideoIndex = index;
+  updateIndicators();
 }
 
 function nextVideo(){
@@ -569,16 +583,6 @@ function prevVideo(){
   if(!videoSlides) return;
   let prev = (currentVideoIndex - 1 + videoSlides.length) % videoSlides.length;
   showVideo(prev);
-}
-
-/* Toggle mute video yang diklik */
-function toggleMuteVideo(e){
-  e.stopPropagation();
-  const video = e.target.previousElementSibling;
-  if(video){
-    video.muted = !video.muted;
-    e.target.innerText = video.muted ? '🔇' : '🔊';
-  }
 }
 
 /* Stop semua video di profile */
@@ -640,15 +644,6 @@ window.onload=()=>{
     index=(index+1)%slides.length;
     slides[index].classList.add('active');
   },3000);
-};
-
-function toggleMute(e){
-  e.stopPropagation();
-  const video=document.getElementById('profileVideo');
-  const btn=e.target;
-
-  video.muted = !video.muted;
-  btn.innerText = video.muted ? '🔇' : '🔊';
 };
 
 function openFullscreen(el){
