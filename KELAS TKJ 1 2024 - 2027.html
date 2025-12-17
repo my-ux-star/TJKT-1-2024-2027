@@ -67,6 +67,40 @@
   box-shadow:0 8px 20px rgba(0,0,0,.4);
 }
 
+.profile-media{
+  display:flex;
+  justify-content:center;
+  margin-bottom:15px;
+}
+
+.profile-media img,
+.profile-media video{
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  object-fit:cover;
+  border:5px solid rgba(255,255,255,.5);
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+
+.video-wrapper{
+  position:relative;
+  display:inline-block;
+}
+
+.mute-btn{
+  position:absolute;
+  bottom:15px;
+  right:15px;
+  background:rgba(0,0,0,.6);
+  border:none;
+  color:#fff;
+  font-size:18px;
+  padding:8px 12px;
+  border-radius:50%;
+  cursor:pointer;
+}
+
 </style>
 </head>
 <body>
@@ -157,7 +191,7 @@
   </div>
 
 <div class="card page" id="profile">
-  <img id="profileFoto" class="foto-profile">
+  <div id="profileMedia" class="profile-media"></div>
   <h2 id="profileName"></h2>
   <p id="profileInfo"></p>
   <div class="box" onclick="navigate('anggota')">⬅ Kembali</div>
@@ -210,7 +244,7 @@ const siswa=[
   hobi:'',
   jabatan:'anggota',
   foto:''},
-  {nama:'AZIZZA URISTU Q.C.',
+  {nama:'AZZIZA URISTU Q.C.',
   jk:'P',
   hobi:'Berenang',
   jabatan:'anggota',
@@ -379,15 +413,30 @@ function navigate(id){
 
 /* ===== PROFILE ===== */
 function showProfile(s){
-  document.getElementById('profileFoto').src =
-  s.foto ? s.foto : 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png';
+  const media=document.getElementById('profileMedia');
+
+  if(s.video){
+    media.innerHTML=`
+      <div class="video-wrapper">
+        <video id="profileVideo" autoplay loop muted playsinline>
+          <source src="${s.video}" type="video/mp4">
+        </video>
+        <button class="mute-btn" onclick="toggleMute()">🔇</button>
+      </div>
+    `;
+  }else{
+    media.innerHTML=`
+      <img src="${s.foto ? s.foto : 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}">
+    `;
+  }
 
   document.getElementById('profileName').innerText = s.nama;
   document.getElementById('profileInfo').innerHTML = `
     <b>Jabatan:</b> ${s.jabatan}<br>
     <b>Jenis Kelamin:</b> ${s.jk}<br>
-    <b>Hobi:</b> ${s.hobi}
+    <b>Hobi:</b> ${s.hobi || '-'}
   `;
+
   navigate('profile');
 }
 
