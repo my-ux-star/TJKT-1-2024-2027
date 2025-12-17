@@ -274,17 +274,17 @@ function driveFix(url){
 }
 
 // Ganti URL dengan Apps Script Web App milikmu
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzR0jNi9mcJswdpUl3cmlduwbNLrStG4a5fRBqMMW6VaBnIwwkDmPXwHFz29-7EvMHUUA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4lgSE37WZt4QEak4AOdFzQzyhx_GQsZp_gRaNWZ02fCz2PWsBUixc8stAefuYLWm7xg/exec";
 
 fetch(SCRIPT_URL)
   .then(res => res.json())
   .then(data => {
     siswa = data.map(d => ({
-      nama: d[Object.keys(d).find(k => k.toLowerCase().includes("NAMA LENGKAP"))] || "-",
+      nama: d[Object.keys(d).find(k => k.toLowerCase().includes("NAMA"))] || "-",
       jk: d[Object.keys(d).find(k => k.toLowerCase().includes("JENIS KELAMIN"))] || "-",
       jabatan: d[Object.keys(d).find(k => k.toLowerCase().includes("JABATAN"))] || "-",
       hobi: d[Object.keys(d).find(k => k.toLowerCase().includes("HOBI"))] || "-",
-      foto: driveFix(d[Object.keys(d).find(k => k.toLowerCase().includes("FOTO PROFIL"))]),
+      foto: driveFix(d[Object.keys(d).find(k => k.toLowerCase().includes("FOTO"))]),
       video: driveFix(d[Object.keys(d).find(k => k.toLowerCase().includes("VIDEO"))])
     }));
 
