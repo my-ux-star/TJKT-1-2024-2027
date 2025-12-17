@@ -269,7 +269,7 @@
   <!-- VIDEO DI BAWAH INFO -->
   <div id="profileVideoWrapper" style="text-align:center;margin-top:20px"></div>
 
-  <div class="box" onclick="navigate('anggota')">⬅ Kembali</div>
+  <div class="box" onclick="navigate('anggota')"> Kembali</div>
 </div>
 
   <div class="card page" id="dashboard">
@@ -438,9 +438,9 @@ const siswa=[
   foto:''},
   {nama:'RIRIN YULIA SARI',
   jk:'P',
-  hobi:'',
+  hobi:'Nonton Anime',
   jabatan:'Anggota',
-  foto:''},
+  foto:'ririny.png',video:['ririny.mp4']},
   {nama:'RIZKY WIJAYA',
   jk:'L',
   hobi:'',
@@ -510,34 +510,33 @@ function showProfile(s){
   `;
 
   if(s.video && s.video.length > 0){
-    let slidesHTML = s.video.map((v, i) => `
-      <div class="video-slide ${i === 0 ? 'active' : ''}">
-        <video class="gif-video" autoplay loop muted playsinline>
-          <source src="${v}" type="video/mp4">
-        </video>
-      </div>
-    `).join('');
+  let slidesHTML = s.video.map((v, i) => `
+    <div class="video-slide ${i === 0 ? 'active' : ''}">
+      <video class="gif-video" autoplay loop muted playsinline>
+        <source src="${v}" type="video/mp4">
+      </video>
+      <button class="mute-btn" onclick="toggleMuteVideo(event)">🔇</button>
+    </div>
+  `).join('');
 
-    videoWrap.innerHTML = `<div class="slider-video">${slidesHTML}</div>`;
+  videoWrap.innerHTML = `<div class="slider-video">${slidesHTML}</div>`;
 
-    currentVideoIndex = 0;
-    videoSlides = videoWrap.querySelectorAll('.video-slide');
+  currentVideoIndex = 0;
+  videoSlides = videoWrap.querySelectorAll('.video-slide');
 
-    const slider = videoWrap.querySelector('.slider-video');
+  const slider = videoWrap.querySelector('.slider-video');
 
-    slider.addEventListener('touchstart', e => {
-      startX = e.touches[0].clientX;
-    });
-
-    slider.addEventListener('touchend', e => {
-      endX = e.changedTouches[0].clientX;
-      if(startX - endX > 50) nextVideo(); // swipe kiri
-      if(endX - startX > 50) prevVideo(); // swipe kanan
-    });
-  } else {
-    videoWrap.innerHTML = '';
-    videoSlides = [];
-  }
+  // SWIPE
+  slider.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+  slider.addEventListener('touchend', e => {
+    endX = e.changedTouches[0].clientX;
+    if(startX - endX > 50) nextVideo(); // swipe kiri
+    if(endX - startX > 50) prevVideo(); // swipe kanan
+  });
+} else {
+  videoWrap.innerHTML = '';
+  videoSlides = [];
+}
 
   navigate('profile');
 }
