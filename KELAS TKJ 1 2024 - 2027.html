@@ -271,12 +271,12 @@ fetch("https://script.google.com/macros/s/AKfycbx7vJ5i1Y6I2iODKY7Y68PyWnFAJNNP6D
   .then(res => res.json())
   .then(data => {
     siswa = data.map(d => ({
-      nama: d["NAMA LENGKAP"],
+      nama: d["NAMA LENGKAP:"],
       jk: d["JENIS KELAMIN"],
       jabatan: d["JABATAN"],
       hobi: d["HOBI"],
-      foto: d["Upload Foto"],
-      video: d["Upload Video"]
+      foto: d["FOTO PROFIL"],
+      video: d["VIDEO"]
     }));
 
     loadSiswa();
