@@ -447,9 +447,12 @@ const siswa=[
 
 /* ===== NAVIGASI ===== */
 function navigate(id){
+  stopProfileVideo(); // ⬅ AUTO MUTE & PAUSE VIDEO
+
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   const page=document.getElementById(id);
   if(page) page.style.display='block';
+
   location.hash=id;
   menu.style.display='none';
 }
@@ -565,6 +568,17 @@ function openFullscreen(el){
   fs.appendChild(clone);
   fs.onclick=()=>fs.remove();
   document.body.appendChild(fs);
+};
+
+function stopProfileVideo(){
+  const video = document.getElementById('profileVideo');
+  const btn = document.querySelector('.mute-btn');
+
+  if(video){
+    video.muted = true;
+    video.pause();
+    if(btn) btn.innerText = '🔇';
+  }
 };
 </script>
 
