@@ -321,12 +321,11 @@ footer {
   position: fixed;
   inset: 0;
   z-index: -1;
-
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
   filter: brightness(0.55);
+  display: none; /* default sembunyi */
 }
 </style>
 </head>
@@ -681,6 +680,7 @@ bg.style.backgroundImage =
   s.bg
     ? `url('${s.bg}')`
     : "url('https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6')";
+bg.style.display = 'block'; // pastikan tampil
     
   document.getElementById('profileMedia').innerHTML = `
     <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
