@@ -266,7 +266,7 @@ footer {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  transition: background-position 0.1s linear;
+  transition:none;
 }
 
 /* Konten tetap di atas */
@@ -668,14 +668,6 @@ div.innerHTML = `
   lk.innerText=siswa.filter(s=>s.jk==='L').length;
   pr.innerText=siswa.filter(s=>s.jk==='P').length;
 }
-
-// ===== GLOBAL PARALLAX SCROLL =====
-window.addEventListener('scroll', ()=>{
-  const profilePage = document.getElementById('profile');
-  if (!profilePage.dataset.bgimg) return; // hanya jika ada bg image
-  const scrollY = window.scrollY;
-  profilePage.style.backgroundPosition = `center ${scrollY * 0.3}px`;
-});
 
 function showProfile(s) {
   stopProfileVideo();
