@@ -174,7 +174,7 @@ html, body {
   margin-bottom: 20px;
 
   background: rgba(255,255,255,.12);
-  backdrop-filter:none;
+  backdrop-filter: blur(10px);
   border-radius: 18px;
   padding: 20px;
 
@@ -201,7 +201,34 @@ footer {
   align-items: center;
   justify-content: center;
 }
+/* PROFILE PARALLAX */
+#profile {
+  position: relative;
+  overflow: hidden;
+}
 
+#profile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image: var(--bg-profile);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  transform: translateY(var(--parallax, 0)) scale(1.15);
+  transition: transform 0.1s linear;
+
+  filter: blur(6px) brightness(0.8);
+  z-index: 0;
+}
+
+/* isi tetap di atas */
+#profile > * {
+  position: relative;
+  z-index: 1;
+}
 /* BORDER FOTO & VIDEO PROFIL */
 .profile-media img,
 .profile-media video {
@@ -231,7 +258,6 @@ footer {
 .slide {
   border-radius: 20px;
 }
-
 .social-media {
   display: flex;
   justify-content: center;
@@ -296,41 +322,10 @@ footer {
   );
   border: 1px solid rgba(255,255,255,0.25);
 }
-/* FIX WARNA HITAM DI CARD ANGGOTA */
-.box,
-.box * {
-  color: #ffffff !important;
-}
-
-/* ICON USER (SVG / FONT) */
-.box svg,
-.box i {
-  fill: #ffffff !important;
-  color: #ffffff !important;
-}
-.box img {
-  filter: brightness(0) invert(1);
-}
-#profile {
-  position: relative;
-  overflow: hidden;
-  background: none !important;
-}
-/* BACKGROUND PROFILE FIXED (ANTI SCROLL BUG) */
-#profile-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: brightness(0.55);
-  display: none; /* default sembunyi */
-}
 </style>
 </head>
 <body>
-<div id="profile-bg"></div>
+
 <header>
   <img src="logo.png" alt="Logo Sekolah" class="logo">
   <h1>KELAS TKJ 1<br>ANGKATAN 2024–2027</h1>
@@ -404,13 +399,13 @@ footer {
   </div>
 
   <div class="card page" id="profile">
-    <div id="profileMedia" class="profile-media"></div>
-    <h2 id="profileName"></h2>
-    <p id="profileInfo"></p>
-    <div id="profileSocial" class="social-media"></div>
-    <div id="profileVideoWrapper" style="text-align:center;margin-top:20px"></div>
-    <div class="box" onclick="navigate('anggota')"> Kembali</div>
-  </div>
+  <div id="profileMedia" class="profile-media"></div>
+  <h2 id="profileName"></h2>
+  <p id="profileInfo"></p>
+  <div class="social-media" id="profileSocial" style="margin-top:15px;"></div>
+  <div id="profileVideoWrapper" style="text-align:center;margin-top:20px"></div>
+  <div class="box" onclick="navigate('anggota')"> Kembali</div>
+</div>
 
   <div class="card page" id="dashboard">
     <h2>Dashboard Kelas</h2>
@@ -635,15 +630,9 @@ let videoSlides = [];
 
 function navigate(id){
   stopProfileVideo();
-
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   const page=document.getElementById(id);
   if(page) page.style.display='block';
-
-  // tampilkan background profile hanya di halaman profile
-  const bg = document.getElementById('profile-bg');
-  bg.style.display = (id === 'profile') ? 'block' : 'none';
-
   location.hash=id;
   menu.style.display='none';
 }
@@ -675,13 +664,10 @@ function showProfile(s){
 
   const profilePage = document.getElementById('profile');
 
-  const bg = document.getElementById('profile-bg');
-bg.style.backgroundImage =
-  s.bg
-    ? `url('${s.bg}')`
-    : "url('https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6')";
-bg.style.display = 'block'; // pastikan tampil
-    
+  profilePage.style.setProperty(
+    '--bg-profile',
+    s.bg ? `url('${s.bg}')` : "url('https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6')"
+  );
   document.getElementById('profileMedia').innerHTML = `
     <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
       onclick="openFullscreen(this)">
@@ -844,6 +830,21 @@ setInterval(()=>{
   });
 },3000);
 };
+
+// PARALLAX SCROLL PROFILE
+const profilePage = document.getElementById('profile');
+
+window.addEventListener('scroll', () => {
+  if (profilePage.style.display !== 'block') return;
+
+  const scrollY = window.scrollY;
+  profilePage.style.setProperty(
+    '--parallax',
+    `${scrollY * 0.15}px`
+  );
+});
+
 </script>
+
 </body>
 </html>
