@@ -280,9 +280,12 @@ footer {
 
 <section>
   <div class="card page" id="beranda">
-    <h2>Beranda</h2>
-    <p>Selamat datang di website resmi <b>KELAS TKJ 1 ANGKATAN 2024–2027</b>.</p>
-    <p>Gunakan menu titik tiga (⋮) di kanan atas untuk melihat struktur kelas, anggota kelas, dashboard, dan moment.</p>
+  <h2>Selamat Datang di Kelas TKJ 1</h2>
+  
+  <p>
+    Website resmi <b>KELAS TKJ 1 ANGKATAN 2024–2027</b>.<br>
+    Di sini kamu bisa melihat profil anggota kelas, struktur organisasi, momen kelas, dan dashboard statistik.
+  </p>
 
     <!-- SLIDER FOTO -->
     <div class="slider">
@@ -290,6 +293,24 @@ footer {
       <img class="slide" src="2.jpg">
       <img class="slide" src="3.jpg">
     </div>
+     <h3 style="margin-top:25px;">Sejarah Singkat Kelas</h3>
+  <p>
+    Kelas TKJ 1 dibentuk pada tahun 2024, terdiri dari siswa-siswa yang memiliki minat di bidang Teknik Komputer dan Jaringan. 
+    Selama 3 tahun ke depan, kelas ini berfokus pada pengembangan keterampilan IT, kolaborasi, dan kreativitas teknologi.
+  </p>
+  <h3>Visi & Misi Kelas</h3>
+  <p><b>Visi:</b> Menjadi kelas yang unggul dalam teknologi dan berkarakter.</p>
+  <p><b>Misi:</b></p>
+  <ul>
+    <li>Meningkatkan keterampilan komputer dan jaringan setiap siswa.</li>
+    <li>Mendorong kerja sama tim dalam setiap kegiatan kelas.</li>
+    <li>Menciptakan lingkungan belajar yang kreatif dan menyenangkan.</li>
+  </ul>
+    <h3>Motivasi Belajar</h3>
+  <p>
+    <i>"Belajar hari ini adalah bekal untuk masa depan." – Septa Ibnu Shina, S.Pd</i><br>
+    Setiap siswa didorong untuk terus mengeksplorasi, mencoba hal baru, dan tidak takut gagal.
+  </p>
   </div>
 
   <div class="card page" id="wali">
@@ -470,13 +491,19 @@ const siswa=[
   jabatan:'Anggota',
   foto:''},
   {nama:'MUHAMMAD RIFALDI KURNIAWAN',
-  jk:'L',
-  hobi:'GAMING',
-  jabatan:'Anggota',
-  foto:'RIFALDI.png',
-  bg:'RIFALDI.jpg',
-  boxbg:'RIFALDIBOX.png',
-  video:['RIFALDI.mp4','RIFALDI2.mp4','RIFALDI3.mp4']},
+ jk:'L',
+ hobi:'GAMING & CODING',
+ jabatan:'Anggota',
+ foto:'RIFALDI.png',
+ bg:'RIFALDI.jpg',
+ boxbg:'RIFALDIBOX.png',
+ video:['RIFALDI.mp4','RIFALDI2.mp4','RIFALDI3.mp4'],
+ sosmed:{
+   ig:'https://www.instagram.com/m.rifaldi.k?igsh=MXF4a3h1MnlnaWU4eQ==',
+   tiktok:'https://www.tiktok.com/@aldirifaldi72?_r=1&_d=e0b4j3d0fii3dl&sec_uid=MS4wLjABAAAA7pP-809uzILjLHQKEDuaKVAE0C7cwegfg0AzbFCsBv48LVVRt71jxWRpHzVj59Ro&share_author_id=6775300066237826050&sharer_language=id&source=h5_t&u_code=da3jjh8mbbckij&timestamp=1766065802&user_id=6775300066237826050&sec_user_id=MS4wLjABAAAA7pP-809uzILjLHQKEDuaKVAE0C7cwegfg0AzbFCsBv48LVVRt71jxWRpHzVj59Ro&item_author_type=1&utm_source=copy&utm_campaign=client_share&utm_medium=android&share_iid=7583665306935002901&share_link_id=e62c8df3-0a23-424f-af17-0dff68ec2512&share_app_id=1180&ugbiz_name=ACCOUNT&ug_btm=b8727%2Cb7360&social_share_type=5&enable_checksum=1',
+   fb:'https://www.facebook.com/aldirifaldi.aldirifaldi.10'
+ }
+},
   {nama:'NAWA AZKIA',
   jk:'P',
   hobi:'',
@@ -616,6 +643,16 @@ function showProfile(s){
     <b>Jenis Kelamin:</b> ${s.jk}<br>
     <b>Hobi:</b> ${s.hobi || '-'}
   `;
+// Sosial Media
+let sosmedHTML = '';
+if(s.sosmed){
+  sosmedHTML = '<div style="margin-top:15px; display:flex; justify-content:center; gap:15px">';
+  if(s.sosmed.ig) sosmedHTML += `<a href="${s.sosmed.ig}" target="_blank"><img src="IG.png" style="width:32px;height:32px"></a>`;
+  if(s.sosmed.tiktok) sosmedHTML += `<a href="${s.sosmed.tiktok}" target="_blank"><img src="TIKTOK.png" style="width:32px;height:32px"></a>`;
+  if(s.sosmed.fb) sosmedHTML += `<a href="${s.sosmed.fb}" target="_blank"><img src="FB.png" style="width:32px;height:32px"></a>`;
+  sosmedHTML += '</div>';
+}
+document.getElementById('profileInfo').innerHTML += sosmedHTML;
 
   const videoWrap = document.getElementById('profileVideoWrapper');
   if(s.video && s.video.length){
