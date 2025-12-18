@@ -62,8 +62,53 @@ html, body {
 
   .page { display:none; animation:fade .4s ease; }
   @keyframes fade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  .anggota { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:20px; }
-  .box { background:rgba(255,255,255,.15); padding:15px; border-radius:15px; text-align:center; cursor:pointer; transition:.3s; }
+  ..anggota {
+  display: flex; /* pakai flex, bukan grid */
+  gap: 20px;
+  overflow-x: auto; /* scroll horizontal */
+  padding-bottom: 10px;
+  scroll-behavior: smooth;
+}
+
+.anggota::-webkit-scrollbar {
+  height: 8px; /* scroll bar horizontal */
+}
+
+.anggota::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.3);
+  border-radius: 4px;
+}
+
+.anggota::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.1);
+}
+.anggota {
+  display: flex;
+  gap: 15px;
+  padding: 15px 10px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  max-width: 100%;
+}
+.anggota .box {
+  flex: 0 0 min(25vw, 220px); /* maksimal 220px, tapi minimal menyesuaikan layar */
+  height: min(30vh, 250px);   /* tinggi mengikuti viewport tapi tetap proporsional */
+  background: rgba(255,255,255,.15);
+  padding: 15px;
+  border-radius: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: .3s;
+}
+  .box {
+  flex: 0 0 180px; /* lebar tetap untuk scroll horizontal */
+  background: rgba(255,255,255,.15);
+  padding: 15px;
+  border-radius: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: .3s;
+}
   .box:hover { background:rgba(255,255,255,.35); transform:translateY(-5px); }
 
   /* MENU TITIK TIGA */
@@ -116,7 +161,20 @@ html, body {
   display: block;
   margin: 0 auto;
 }
+.profile-media img,
+.profile-media video {
+  width: min(80vw, 260px);
+  height: min(80vw, 260px);
+}
 
+.slider-video {
+  width: min(85vw, 300px);
+  height: min(85vw, 300px);
+}
+
+.slider {
+  height: min(40vh, 250px); /* lebih tinggi dari default 200px */
+}
   /* Slider Video */
   .slider-video { position: relative; width: 260px; height: 260px; margin: 0 auto; overflow: hidden; border-radius: 20px; }
   .slider-video {
