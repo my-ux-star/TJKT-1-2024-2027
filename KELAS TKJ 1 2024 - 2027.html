@@ -43,10 +43,17 @@
   .profile-media img, .profile-media video { width:260px; height:260px; border-radius:50%; object-fit:cover; border:5px solid rgba(255,255,255,.5); box-shadow:0 10px 30px rgba(0,0,0,.5); }
   .gif-video { width:260px; height:260px; border-radius:20px; object-fit:cover; box-shadow:0 10px 30px rgba(0,0,0,.5); }
 
-  /* Slider Video */
-  .slider-video { position: relative; width: 260px; height: 260px; margin: 0 auto; overflow: hidden; border-radius: 20px; }
-  .video-slide { position: absolute; top:0; left:0; width: 100%; height: 100%; opacity:0; transition: opacity 0.3s ease; }
-  .video-slide.active { opacity:1; position: relative; }
+ /* Slider Foto - animasi geser */
+.slider { position: relative; margin-top:20px; border-radius:20px; overflow:hidden; height:260px; }
+.slide { width:100%; height:100%; position:absolute; top:0; left:100%; transition:all 0.6s ease; opacity:1; }
+.slide.active { left:0; }
+.slide.prev { left:-100%; }
+
+/* Slider Video - animasi geser */
+.slider-video { position: relative; width: 260px; height: 260px; margin: 0 auto; overflow: hidden; border-radius: 20px; }
+.video-slide { position: absolute; top:0; left:100%; width: 100%; height: 100%; transition: all 0.5s ease; opacity:1; }
+.video-slide.active { left:0; }
+.video-slide.prev { left:-100%; }
 
   /* Fullscreen */
   .fullscreen { position:fixed; inset:0; background:rgba(0,0,0,.9); display:flex; justify-content:center; align-items:center; z-index:9999; }
@@ -477,15 +484,75 @@ window.onload=()=>{
   loadSiswa();
   navigate(location.hash.replace('#','')||'beranda');
   
-  // slider gambar beranda
-  let index=0;
-  const slides=document.querySelectorAll('.slide');
-  setInterval(()=>{
-    slides[index].classList.remove('active');
-    index=(index+1)%slides.length;
-    slides[index].classList.add('active');
-  },3000);
-};
+// FOTO SLIDER
+let slideIndex = 0;
+const slides = document.querySelectorAll('.slide');
+
+function showSlide(index) {
+  slides.forEach((slide, i) => {
+    slide.classList.remove('active','prev');
+    if(i === index) slide.classList.add('active');
+    if(i === (index - 1 + slides.length) % slides.length) slide.classList.add('prev');
+  });
+}
+
+function nextSlide() {
+  slideIndex = (slideIndex + 1) % slides.length;
+  showSlide(slideIndex);
+}
+
+function prevSlide() {
+  slideIndex = (slideIndex - 1 + slides.length) % slides.length;
+  showSlide(slideIndex);
+}
+
+const slider = document.querySelector('.slider');
+let startX = 0;
+let endX = 0;
+slider.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+slider.addEventListener('touchend', e => {
+  endX = e.changedTouches[0].clientX;
+  if(startX - endX > 50) nextSlide();
+  if(endX - startX > 50) prevSlide();
+});
+
+setInterval(nextSlide, 3000);
+
+// VIDEO SLIDER
+function showVideo(index){
+  if(!videoSlides.length) return;
+  videoSlides.forEach((slide,i)=>{
+    slide.classList.remove('active','prev');
+    const vid = slide.querySelector('video');
+    if(i===index){ 
+      slide.classList.add('active');
+      if(vid){ vid.muted=false; vid.play(); }
+    } else {
+      if(i === (currentVideoIndex - 1 + videoSlides.length) % videoSlides.length) slide.classList.add('prev');
+      if(vid){ vid.muted=true; vid.pause(); vid.currentTime=0; }
+    }
+  });
+  currentVideoIndex=index;
+  updateIndicators();
+}
+
+function nextVideo(){ showVideo((currentVideoIndex+1)%videoSlides.length); }
+function prevVideo(){ showVideo((currentVideoIndex-1+videoSlides.length)%videoSlides.length); }
+}
+
+let startX = 0;
+let endX = 0;
+slider.addEventListener('touchstart', (e) => {
+  startX = e.touches[0].clientX;
+});
+slider.addEventListener('touchend', (e) => {
+  endX = e.changedTouches[0].clientX;
+  if (startX - endX > 50) nextSlide();
+  if (endX - startX > 50) prevSlide();
+});
+
+setInterval(nextSlide, 3000);
+
 </script>
 
 </body>
