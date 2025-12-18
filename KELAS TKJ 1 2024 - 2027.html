@@ -32,7 +32,8 @@
   height:100%;
   object-fit:cover;
   transform:translateX(100%);
-  transition:transform .6s ease;
+  opacity:0;
+  transition:transform .6s ease, opacity .6s ease;
 }
 
   .page { display:none; animation:fade .4s ease; }
@@ -57,12 +58,49 @@
 
   /* Profile Media */
   .foto-profile { width:140px; height:140px; border-radius:50%; object-fit:cover; margin:0 auto 15px; display:block; border:4px solid rgba(255,255,255,.4); box-shadow:0 8px 20px rgba(0,0,0,.4); }
-  .profile-media { display:flex; justify-content:center; margin-bottom:15px; }
-  .profile-media img, .profile-media video { width:260px; height:260px; border-radius:50%; object-fit:cover; border:5px solid rgba(255,255,255,.5); box-shadow:0 10px 30px rgba(0,0,0,.5); }
-  .gif-video { width:260px; height:260px; border-radius:20px; object-fit:cover; box-shadow:0 10px 30px rgba(0,0,0,.5); }
+  .profile-media img,
+.profile-media video {
+  width: min(80vw, 260px);
+  height: min(80vw, 260px);
+  border-radius: 50%;
+  object-fit: cover;
+
+  border: 4px solid rgba(255,255,255,0.55);
+  outline: 3px solid rgba(255,255,255,0.15);
+
+  box-shadow:
+    0 12px 35px rgba(0,0,0,0.55),
+    inset 0 0 15px rgba(255,255,255,0.2);
+
+  transition: transform 0.3s ease;
+}
+
+.profile-media img:active,
+.profile-media video:active {
+  transform: scale(0.97);
+}
+.profile-media {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 20px auto;
+  text-align: center;
+}
+.profile-media img,
+.profile-media video {
+  display: block;
+  margin: 0 auto;
+}
 
   /* Slider Video */
   .slider-video { position: relative; width: 260px; height: 260px; margin: 0 auto; overflow: hidden; border-radius: 20px; }
+  .slider-video {
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
   .video-slide {
   position:absolute;
   top:0;
@@ -80,6 +118,13 @@
   transform:translateX(-200%);
 }
 
+.gif-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
   /* Fullscreen */
   .fullscreen { position:fixed; inset:0; background:rgba(0,0,0,.9); display:flex; justify-content:center; align-items:center; z-index:9999; }
   .fullscreen img, .fullscreen video{ max-width:90%; max-height:90%; border-radius:15px; }
@@ -87,6 +132,20 @@
   /* Video Indicators */
   .video-indicators .dot { display:inline-block; width:10px; height:10px; margin:0 5px; background:#ccc; border-radius:50%; cursor:pointer; }
   .video-indicators .dot.active { background:#fff; }
+  
+  @media (max-width: 480px) {
+  .profile-media img,
+  .profile-media video {
+    width: 75vw;
+    height: 75vw;
+  }
+
+  .slider-video {
+    width: 85vw;
+    height: 85vw;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -490,8 +549,15 @@ function showVideo(index){
   updateIndicators();
 }
 
-function nextVideo(){ showVideo((currentVideoIndex+1)%videoSlides.length); }
-function prevVideo(){ showVideo((currentVideoIndex-1+videoSlides.length)%videoSlides.length); }
+function nextVideo(){
+  if(currentVideoIndex >= videoSlides.length - 1) return; // mentok kanan
+  showVideo(currentVideoIndex + 1);
+}
+
+function prevVideo(){
+  if(currentVideoIndex <= 0) return; // mentok kiri
+  showVideo(currentVideoIndex - 1);
+}
 
 function updateIndicators(){
   document.querySelectorAll('.video-indicators .dot').forEach((dot,i)=>{
@@ -525,18 +591,27 @@ window.onload=()=>{
  const slides = document.querySelectorAll('.slide');
 let currentSlide = 0;
 
+// tampilkan slide pertama
 slides[0].style.transform = 'translateX(0)';
+slides[0].style.opacity = '1';
 
 setInterval(()=>{
   const prev = currentSlide;
   currentSlide = (currentSlide + 1) % slides.length;
 
+  // slide lama keluar ke kiri
   slides[prev].style.transform = 'translateX(-100%)';
-  slides[currentSlide].style.transform = 'translateX(0)';
+  slides[prev].style.opacity = '0';
 
+  // slide baru masuk dari kanan
+  slides[currentSlide].style.transform = 'translateX(0)';
+  slides[currentSlide].style.opacity = '1';
+
+  // reset slide lain
   slides.forEach((s,i)=>{
     if(i !== prev && i !== currentSlide){
       s.style.transform = 'translateX(100%)';
+      s.style.opacity = '0';
     }
   });
 },3000);
