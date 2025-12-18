@@ -258,6 +258,52 @@ footer {
 .slide {
   border-radius: 20px;
 }
+
+.social-media {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.social-media a {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(6px);
+  font-size: 20px;
+  color: white;
+  text-decoration: none;
+
+  transition: transform .3s, background .3s;
+}
+
+.social-media a:hover {
+  transform: scale(1.15);
+  background: rgba(255,255,255,.35);
+}
+.social-media a svg {
+  width: 22px;
+  height: 22px;
+  fill: white;
+}
+
+.social-media a.ig {
+  background: linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4);
+}
+
+.social-media a.tiktok {
+  background: #000;
+}
+
+.social-media a.fb {
+  background: #1877f2;
+}
 </style>
 </head>
 <body>
@@ -338,6 +384,7 @@ footer {
     <div id="profileMedia" class="profile-media"></div>
     <h2 id="profileName"></h2>
     <p id="profileInfo"></p>
+    <div id="profileSocial" class="social-media"></div>
     <div id="profileVideoWrapper" style="text-align:center;margin-top:20px"></div>
     <div class="box" onclick="navigate('anggota')"> Kembali</div>
   </div>
@@ -471,11 +518,15 @@ const siswa=[
   foto:''},
   {nama:'MUHAMMAD RIFALDI KURNIAWAN',
   jk:'L',
-  hobi:'GAMING',
+  hobi:'GAMING & CODING',
   jabatan:'Anggota',
   foto:'RIFALDI.png',
   bg:'RIFALDI.jpg',
-  video:['RIFALDI.mp4','RIFALDI2.mp4','RIFALDI3.mp4']},
+  video:['RIFALDI.mp4','RIFALDI2.mp4'],
+  sosmed:{
+    ig:'https://www.instagram.com/m.rifaldi.k?igsh=MXF4a3h1MnlnaWU4eQ==',
+    tiktok:'tiktok.com/@aldirifaldi72',
+    fb:'https://www.facebook.com/aldirifaldi.aldirifaldi.10'}},
   {nama:'NAWA AZKIA',
   jk:'P',
   hobi:'',
@@ -609,7 +660,38 @@ function showProfile(s){
     <b>Jenis Kelamin:</b> ${s.jk}<br>
     <b>Hobi:</b> ${s.hobi || '-'}
   `;
+const social = document.getElementById('profileSocial');
+social.innerHTML = '';
 
+if (s.sosmed) {
+
+  if (s.sosmed.ig) {
+    social.innerHTML += `
+      <a href="${s.sosmed.ig}" target="_blank" class="ig">
+        <svg viewBox="0 0 448 512">
+          <path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9 114.9-51.3 114.9-114.9S287.7 141 224.1 141zm0 189.6c-41.2 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.5 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.9-26.9 26.9s-26.9-12-26.9-26.9 12-26.9 26.9-26.9 26.9 12 26.9 26.9zM448 80v352c0 44.2-35.8 80-80 80H80c-44.2 0-80-35.8-80-80V80c0-44.2 35.8-80 80-80h288c44.2 0 80 35.8 80 80z"/>
+        </svg>
+      </a>`;
+  }
+
+  if (s.sosmed.tiktok) {
+    social.innerHTML += `
+      <a href="${s.sosmed.tiktok}" target="_blank" class="tiktok">
+        <svg viewBox="0 0 448 512">
+          <path d="M448 209.9v125.1c-60.8 0-117.5-19.8-164-53.3v96.8c0 72.6-58.8 131.5-131.5 131.5S21 451.1 21 378.5s58.8-131.5 131.5-131.5c6.1 0 12.1.4 18 1.3v73.5c-6-2-12.3-3-18-3-32.8 0-59.5 26.7-59.5 59.5s26.7 59.5 59.5 59.5 59.5-26.7 59.5-59.5V0h73.6c4.9 42.3 40.5 75.8 83.4 75.8z"/>
+        </svg>
+      </a>`;
+  }
+
+  if (s.sosmed.fb) {
+    social.innerHTML += `
+      <a href="${s.sosmed.fb}" target="_blank" class="fb">
+        <svg viewBox="0 0 320 512">
+          <path d="M279.14 288l14.22-92.66h-88.91V117.78c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/>
+        </svg>
+      </a>`;
+  }
+}
   const videoWrap = document.getElementById('profileVideoWrapper');
   if(s.video && s.video.length){
     videoWrap.innerHTML = `<div class="slider-video">${s.video.map((v,i)=>`
