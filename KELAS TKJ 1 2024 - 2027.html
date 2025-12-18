@@ -315,6 +315,29 @@ footer {
   transform: scale(1.15);
   background: rgba(255,255,255,.35);
 }
+.box {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.18),
+    rgba(255,255,255,0.08)
+  );
+  border: 1px solid rgba(255,255,255,0.25);
+}
+/* FIX WARNA HITAM DI CARD ANGGOTA */
+.box,
+.box * {
+  color: #ffffff !important;
+}
+
+/* ICON USER (SVG / FONT) */
+.box svg,
+.box i {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+.box img {
+  filter: brightness(0) invert(1);
+}
 </style>
 </head>
 <body>
