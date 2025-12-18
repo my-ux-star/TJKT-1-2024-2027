@@ -37,11 +37,12 @@ html, body {
   margin: 0 auto;
 }
   
+/* Slider Beranda 4:3 */
 .slider {
   width: 100%;
-  aspect-ratio: 4 / 3;       /* proporsi lebih tinggi */
-  min-height: 300px;         /* tinggi minimum supaya tidak gepeng */
-  max-height: 500px;         /* tinggi maksimal agar tidak terlalu besar di desktop */
+  aspect-ratio: 4 / 3; /* proporsi 4:3 */
+  min-height: 300px;   /* tinggi minimal */
+  max-height: 500px;   /* tinggi maksimal agar tidak terlalu besar di desktop */
   position: relative;
   overflow: hidden;
   border-radius: 20px;
@@ -62,15 +63,6 @@ html, body {
   transform: translateX(100%);
   opacity: 0;
   transition: transform .6s ease, opacity .6s ease;
-}
-
-/* Untuk layar kecil tetap responsif */
-@media (max-width: 480px) {
-  .slider {
-    aspect-ratio: 1 / 1;  /* lebih kotak untuk mobile */
-    min-height: 200px;
-    max-height: 300px;
-  }
 }
 
   .page { display:none; animation:fade .4s ease; }
