@@ -43,73 +43,10 @@
   .profile-media img, .profile-media video { width:260px; height:260px; border-radius:50%; object-fit:cover; border:5px solid rgba(255,255,255,.5); box-shadow:0 10px 30px rgba(0,0,0,.5); }
   .gif-video { width:260px; height:260px; border-radius:20px; object-fit:cover; box-shadow:0 10px 30px rgba(0,0,0,.5); }
 
-/* Slider Foto - RESPONSIVE */
-.slider {
-  position: relative;
-  margin-top: 20px;
-  border-radius: 20px;
-  overflow: hidden;
-  width: 100%;
-  aspect-ratio: 16 / 9; /* otomatis tinggi menyesuaikan */
-  background: #000;
-}
-
-.slide {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  inset: 0;
-  object-fit: cover; /* FOTO MENYESUAIKAN */
-  transition: all 0.6s ease;
-  opacity: 0;
-}
-
-.slide.active {
-  opacity: 1;
-  z-index: 2;
-}
-
-.slide.prev {
-  opacity: 0;
-  z-index: 1;
-}
-
-/* === VIDEO PROFILE RESPONSIVE === */
-.slider-video {
-  position: relative;
-  width: 100%;
-  max-width: 380px;       /* lebih besar dari sebelumnya */
-  aspect-ratio: 1 / 1;   /* kotak rapi */
-  margin: 20px auto;
-  overflow: hidden;
-  border-radius: 22px;
-  border: 4px solid rgba(255,255,255,.5);
-  box-shadow: 0 12px 35px rgba(0,0,0,.55);
-  background: #000;
-}
-
-.video-slide {
-  position: absolute;
-  inset: 0;
-  left: 100%;
-  transition: all 0.5s ease;
-}
-
-.video-slide.active {
-  left: 0;
-  z-index: 2;
-}
-
-.video-slide.prev {
-  left: -100%;
-}
-
-.gif-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* FULL, PAS, TIDAK GEpeng */
-  border-radius: 18px;
-}
+  /* Slider Video */
+  .slider-video { position: relative; width: 260px; height: 260px; margin: 0 auto; overflow: hidden; border-radius: 20px; }
+  .video-slide { position: absolute; top:0; left:0; width: 100%; height: 100%; opacity:0; transition: opacity 0.3s ease; }
+  .video-slide.active { opacity:1; position: relative; }
 
   /* Fullscreen */
   .fullscreen { position:fixed; inset:0; background:rgba(0,0,0,.9); display:flex; justify-content:center; align-items:center; z-index:9999; }
@@ -118,14 +55,6 @@
   /* Video Indicators */
   .video-indicators .dot { display:inline-block; width:10px; height:10px; margin:0 5px; background:#ccc; border-radius:50%; cursor:pointer; }
   .video-indicators .dot.active { background:#fff; }
-  
-  .gif-video {
-  cursor: pointer;
-}
-.gif-video:active {
-  transform: scale(0.98);
-}
-
 </style>
 </head>
 <body>
@@ -505,36 +434,26 @@ function showProfile(s){
 
 function showVideo(index){
   if(!videoSlides.length) return;
-
   videoSlides.forEach((slide,i)=>{
-    slide.classList.remove('active','prev');
+    slide.classList.toggle('active',i===index);
     const vid = slide.querySelector('video');
-
-    if(i === index){
-      slide.classList.add('active');
-
-      if(vid){
-        // JANGAN paksa play kalau user pause
-        if(!vid.dataset.userPaused){
-          vid.muted = false;
-          vid.play();
-        }
-      }
-    } else {
-      if(i === (currentVideoIndex - 1 + videoSlides.length) % videoSlides.length){
-        slide.classList.add('prev');
-      }
-      if(vid){
-        vid.pause();
-        vid.currentTime = 0;
-        vid.dataset.userPaused = '';
-      }
+    if(vid){
+      if(i===index){ vid.muted=false; vid.play(); }
+      else { vid.muted=true; vid.pause(); vid.currentTime=0; }
     }
   });
-
-  currentVideoIndex = index;
+  currentVideoIndex=index;
   updateIndicators();
-};
+}
+
+function nextVideo(){ showVideo((currentVideoIndex+1)%videoSlides.length); }
+function prevVideo(){ showVideo((currentVideoIndex-1+videoSlides.length)%videoSlides.length); }
+
+function updateIndicators(){
+  document.querySelectorAll('.video-indicators .dot').forEach((dot,i)=>{
+    dot.style.background = (i===currentVideoIndex?'#fff':'#ccc');
+  });
+}
 
 function stopProfileVideo(){
   if(!videoSlides.length) return;
@@ -558,103 +477,15 @@ window.onload=()=>{
   loadSiswa();
   navigate(location.hash.replace('#','')||'beranda');
   
-// FOTO SLIDER
-let slideIndex = 0;
-const slides = document.querySelectorAll('.slide');
-
-function showSlide(index) {
-  slides.forEach((slide, i) => {
-    slide.classList.remove('active','prev');
-    if(i === index) slide.classList.add('active');
-    if(i === (index - 1 + slides.length) % slides.length) slide.classList.add('prev');
-  });
-}
-
-function nextSlide() {
-  slideIndex = (slideIndex + 1) % slides.length;
-  showSlide(slideIndex);
-}
-
-function prevSlide() {
-  slideIndex = (slideIndex - 1 + slides.length) % slides.length;
-  showSlide(slideIndex);
-}
-
-const slider = document.querySelector('.slider');
-let startX = 0;
-let endX = 0;
-slider.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-slider.addEventListener('touchend', e => {
-  endX = e.changedTouches[0].clientX;
-  if(startX - endX > 50) nextSlide();
-  if(endX - startX > 50) prevSlide();
-});
-
-// VIDEO SLIDER
-function showVideo(index){
-  if(!videoSlides.length) return;
-  videoSlides.forEach((slide,i)=>{
-    slide.classList.remove('active','prev');
-    const vid = slide.querySelector('video');
-    if(i===index){ 
-      slide.classList.add('active');
-      if(vid){ vid.muted=false; vid.play(); }
-    } else {
-      if(i === (currentVideoIndex - 1 + videoSlides.length) % videoSlides.length) slide.classList.add('prev');
-      if(vid){ vid.muted=true; vid.pause(); vid.currentTime=0; }
-    }
-  });
-  currentVideoIndex=index;
-  updateIndicators();
-}
-
-function nextVideo(){ showVideo((currentVideoIndex+1)%videoSlides.length); }
-function prevVideo(){ showVideo((currentVideoIndex-1+videoSlides.length)%videoSlides.length); }
-}
-
-let startX = 0;
-let endX = 0;
-slider.addEventListener('touchstart', (e) => {
-  startX = e.touches[0].clientX;
-});
-slider.addEventListener('touchend', (e) => {
-  endX = e.changedTouches[0].clientX;
-  if (startX - endX > 50) nextSlide();
-  if (endX - startX > 50) prevSlide();
-});
-
-setInterval(nextSlide, 3000);
-
-// === TOGGLE PLAY / PAUSE VIDEO SAAT DIKLIK ===
-document.addEventListener('click', function (e) {
-  const video = e.target.closest('video');
-  if (!video) return;
-
-  // Jangan ganggu swipe
-  e.preventDefault();
-
-  if (video.paused) {
-    video.play();
-  } else {
-    video.pause();
-  }
-});
-
-document.addEventListener('click', function(e){
-  const video = e.target.closest('.gif-video');
-  if(!video) return;
-
-  e.stopPropagation();
-
-  if(video.paused){
-    video.play();
-    video.dataset.userPaused = '';
-  } else {
-    video.pause();
-    video.dataset.userPaused = 'true';
-  }
-});
-
+  // slider gambar beranda
+  let index=0;
+  const slides=document.querySelectorAll('.slide');
+  setInterval(()=>{
+    slides[index].classList.remove('active');
+    index=(index+1)%slides.length;
+    slides[index].classList.add('active');
+  },3000);
+};
 </script>
 
 </body>
