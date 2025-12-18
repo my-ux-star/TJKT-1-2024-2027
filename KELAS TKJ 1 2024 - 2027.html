@@ -505,26 +505,36 @@ function showProfile(s){
 
 function showVideo(index){
   if(!videoSlides.length) return;
+
   videoSlides.forEach((slide,i)=>{
-    slide.classList.toggle('active',i===index);
+    slide.classList.remove('active','prev');
     const vid = slide.querySelector('video');
-    if(vid){
-      if(i===index){ vid.muted=false; vid.play(); }
-      else { vid.muted=true; vid.pause(); vid.currentTime=0; }
+
+    if(i === index){
+      slide.classList.add('active');
+
+      if(vid){
+        // JANGAN paksa play kalau user pause
+        if(!vid.dataset.userPaused){
+          vid.muted = false;
+          vid.play();
+        }
+      }
+    } else {
+      if(i === (currentVideoIndex - 1 + videoSlides.length) % videoSlides.length){
+        slide.classList.add('prev');
+      }
+      if(vid){
+        vid.pause();
+        vid.currentTime = 0;
+        vid.dataset.userPaused = '';
+      }
     }
   });
-  currentVideoIndex=index;
+
+  currentVideoIndex = index;
   updateIndicators();
-}
-
-function nextVideo(){ showVideo((currentVideoIndex+1)%videoSlides.length); }
-function prevVideo(){ showVideo((currentVideoIndex-1+videoSlides.length)%videoSlides.length); }
-
-function updateIndicators(){
-  document.querySelectorAll('.video-indicators .dot').forEach((dot,i)=>{
-    dot.style.background = (i===currentVideoIndex?'#fff':'#ccc');
-  });
-}
+};
 
 function stopProfileVideo(){
   if(!videoSlides.length) return;
@@ -627,6 +637,21 @@ document.addEventListener('click', function (e) {
     video.play();
   } else {
     video.pause();
+  }
+});
+
+document.addEventListener('click', function(e){
+  const video = e.target.closest('.gif-video');
+  if(!video) return;
+
+  e.stopPropagation();
+
+  if(video.paused){
+    video.play();
+    video.dataset.userPaused = '';
+  } else {
+    video.pause();
+    video.dataset.userPaused = 'true';
   }
 });
 
