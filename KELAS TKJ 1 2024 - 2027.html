@@ -201,7 +201,7 @@ footer {
   align-items: center;
   justify-content: center;
 }
-/* Background khusus halaman profile */
+/* PROFILE PARALLAX */
 #profile {
   position: relative;
   overflow: hidden;
@@ -211,15 +211,20 @@ footer {
   content: "";
   position: absolute;
   inset: 0;
+
   background-image: var(--bg-profile);
   background-size: cover;
   background-position: center;
-  filter: blur(8px) brightness(0.6);
-  transform: scale(1.1);
+  background-repeat: no-repeat;
+
+  transform: translateY(var(--parallax, 0)) scale(1.15);
+  transition: transform 0.1s linear;
+
+  filter: blur(6px) brightness(0.6);
   z-index: 0;
 }
 
-/* agar isi profile di atas background */
+/* isi tetap di atas */
 #profile > * {
   position: relative;
   z-index: 1;
@@ -702,6 +707,20 @@ setInterval(()=>{
   });
 },3000);
 };
+
+// PARALLAX SCROLL PROFILE
+const profilePage = document.getElementById('profile');
+
+window.addEventListener('scroll', () => {
+  if (profilePage.style.display !== 'block') return;
+
+  const scrollY = window.scrollY;
+  profilePage.style.setProperty(
+    '--parallax',
+    `${scrollY * 0.15}px`
+  );
+});
+
 </script>
 
 </body>
