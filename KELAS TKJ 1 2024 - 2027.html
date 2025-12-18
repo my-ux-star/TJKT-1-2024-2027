@@ -6,22 +6,46 @@
 <title>KELAS TKJ 1 ANGKATAN 2024–2027</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
   * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-  body { min-height:100vh; width:100vw; overflow-x:hidden; background:linear-gradient(135deg,#0f2027,#203a43,#2c5364); color:#fff; }
+  body {
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color: #fff;
+}
+
   header { text-align:center; padding:40px 20px; position:relative; }
   h1 { font-size:2.4rem; }
   .logo { width:90px; margin-bottom:15px; }
   @media(max-width:600px){ h1{ font-size:1.8rem; } .logo{ width:70px; } }
-  section { padding:40px 20px; max-width:1200px; margin:auto; }
-  .card { background:rgba(255,255,255,.1); backdrop-filter:blur(10px); border-radius:20px; padding:30px; margin-bottom:30px; box-shadow:0 8px 25px rgba(0,0,0,.3); }
-  .slider { position:relative; margin-top:20px; border-radius:20px; overflow:hidden; }
+  section {
+  flex: 1;
+  width: 100%;
+  padding: 20px 15px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
   
-.slider{
-  position:relative;
-  margin-top:20px;
-  border-radius:20px;
-  overflow:hidden;
-  height:220px;
+.slider {
+  width: 100%;
+  aspect-ratio: 16 / 9; /* default landscape */
+  height: auto;
+  max-height: 40vh;
+
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
 }
 
 .slide{
@@ -145,7 +169,61 @@
     height: 85vw;
   }
 }
+.card {
+  width: 100%;
+  margin-bottom: 20px;
 
+  background: rgba(255,255,255,.12);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  padding: 20px;
+
+  box-shadow: 0 8px 25px rgba(0,0,0,.3);
+}
+.slider {
+  width: 100%;
+  height: 200px;
+}
+
+@media (max-width: 480px) {
+  .slider {
+    height: 160px;
+  }
+}
+footer {
+  text-align: center;
+  padding: 15px;
+  font-size: 0.85rem;
+  opacity: 0.8;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+/* Background khusus halaman profile */
+#profile {
+  position: relative;
+  overflow: hidden;
+}
+
+#profile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--bg-profile);
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px) brightness(0.6);
+  transform: scale(1.1);
+  z-index: 0;
+}
+
+/* agar isi profile di atas background */
+#profile > * {
+  position: relative;
+  z-index: 1;
+}
 </style>
 </head>
 <body>
@@ -362,7 +440,8 @@ const siswa=[
   hobi:'GAMING',
   jabatan:'Anggota',
   foto:'RIFALDI.png',
-  video:['RIFALDI.mp4','RIFALDI2.mp4']},
+  bg:'RIFALDI.jpg',
+  video:['RIFALDI.mp4','RIFALDI2.mp4','RIFALDI3.mp4']},
   {nama:'NAWA AZKIA',
   jk:'P',
   hobi:'',
@@ -479,6 +558,13 @@ function loadSiswa(){
 
 function showProfile(s){
   stopProfileVideo();
+
+  const profilePage = document.getElementById('profile');
+
+  profilePage.style.setProperty(
+    '--bg-profile',
+    s.bg ? `url('${s.bg}')` : "url('https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6')"
+  );
   document.getElementById('profileMedia').innerHTML = `
     <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
       onclick="openFullscreen(this)">
