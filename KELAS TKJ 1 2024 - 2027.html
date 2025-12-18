@@ -220,7 +220,7 @@ footer {
   transform: translateY(var(--parallax, 0)) scale(1.15);
   transition: transform 0.1s linear;
 
-  filter: blur(3px) brightness(1.0);
+  filter: blur(6px) brightness(0.8);
   z-index: 0;
 }
 
@@ -257,70 +257,6 @@ footer {
 }
 .slide {
   border-radius: 20px;
-}
-.social-media {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  margin-top: 18px;
-}
-
-.social-media a {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(255,255,255,.18);
-  backdrop-filter: blur(6px);
-  font-size: 20px;
-  color: white;
-  text-decoration: none;
-
-  transition: transform .3s, background .3s;
-}
-
-.social-media a:hover {
-  transform: scale(1.15);
-  background: rgba(255,255,255,.35);
-}
-.social-media a svg {
-  width: 22px;
-  height: 22px;
-  fill: white;
-}
-.social-media a img {
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
-}
-
-.social-media a {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.2);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: transform .3s, background .3s;
-}
-
-.social-media a:hover {
-  transform: scale(1.15);
-  background: rgba(255,255,255,.35);
-}
-.box {
-  background: linear-gradient(
-    135deg,
-    rgba(255,255,255,0.18),
-    rgba(255,255,255,0.08)
-  );
-  border: 1px solid rgba(255,255,255,0.25);
 }
 </style>
 </head>
@@ -399,13 +335,12 @@ footer {
   </div>
 
   <div class="card page" id="profile">
-  <div id="profileMedia" class="profile-media"></div>
-  <h2 id="profileName"></h2>
-  <p id="profileInfo"></p>
-  <div class="social-media" id="profileSocial" style="margin-top:15px;"></div>
-  <div id="profileVideoWrapper" style="text-align:center;margin-top:20px"></div>
-  <div class="box" onclick="navigate('anggota')"> Kembali</div>
-</div>
+    <div id="profileMedia" class="profile-media"></div>
+    <h2 id="profileName"></h2>
+    <p id="profileInfo"></p>
+    <div id="profileVideoWrapper" style="text-align:center;margin-top:20px"></div>
+    <div class="box" onclick="navigate('anggota')"> Kembali</div>
+  </div>
 
   <div class="card page" id="dashboard">
     <h2>Dashboard Kelas</h2>
@@ -536,16 +471,11 @@ const siswa=[
   foto:''},
   {nama:'MUHAMMAD RIFALDI KURNIAWAN',
   jk:'L',
-  hobi:'GAMING & CODING',
+  hobi:'GAMING',
   jabatan:'Anggota',
   foto:'RIFALDI.png',
-  box:'RIFALDIBOX.png',
   bg:'RIFALDI.jpg',
-  video:['RIFALDI.mp4','RIFALDI2.mp4','RIFALDI3.mp4'],
-  sosmed:{
-    ig:'https://www.instagram.com/m.rifaldi.k?igsh=MXF4a3h1MnlnaWU4eQ==',
-    tiktok:'https://www.tiktok.com/@aldirifaldi72?_r=1&_t=ZS-92KBwxs6iIu',
-    fb:'https://www.facebook.com/aldirifaldi.aldirifaldi.10'}},
+  video:['RIFALDI.mp4','RIFALDI2.mp4','RIFALDI3.mp4']},
   {nama:'NAWA AZKIA',
   jk:'P',
   hobi:'',
@@ -581,8 +511,7 @@ const siswa=[
   jk:'P',
   hobi:'Nonton Anime',
   jabatan:'Anggota',
-  foto:'ririny.png',
-  video:['ririny.mp4']},
+  foto:'ririny.png',video:['ririny.mp4']},
   {nama:'RIZKY WIJAYA',
   jk:'L',
   hobi:'',
@@ -643,48 +572,22 @@ menuBtn.addEventListener('click',()=>{ menu.style.display = menu.style.display==
 menu.querySelectorAll('div').forEach(item=>{ item.addEventListener('click',()=>navigate(item.dataset.page)); });
 
 function loadSiswa(){
-  listSiswa.innerHTML = '';
-  siswa.forEach(s => {
-    const div = document.createElement('div');
-    div.className = 'box';
-
-    // Gunakan properti box sebagai background, kalau kosong pakai default
-    div.style.background = s.box 
-      ? `url('${s.box}') center/cover no-repeat` 
-      : `url('https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png') center/cover no-repeat`;
-
-    div.style.color = '#fff';
-    div.style.display = 'flex';
-    div.style.flexDirection = 'column';
-    div.style.justifyContent = 'flex-end';
-    div.style.alignItems = 'center';
-    div.style.padding = '10px';
-    div.style.height = '180px';
-    div.style.borderRadius = '15px';
-    div.style.boxShadow = '0 6px 20px rgba(0,0,0,.3)';
-
-    // Tambahkan overlay supaya teks lebih jelas
-    const overlay = document.createElement('div');
-    overlay.style.position = 'absolute';
-    overlay.style.inset = '0';
-    overlay.style.background = 'rgba(0,0,0,0.35)';
-    overlay.style.borderRadius = '15px';
-    div.appendChild(overlay);
-
-    // Teks di atas overlay
-    const text = document.createElement('div');
-    text.style.position = 'relative';
-    text.style.zIndex = '1';
-    text.innerHTML = `<b>${s.nama}</b><br><small>${s.jabatan}</small>`;
-    div.appendChild(text);
-
-    div.onclick = () => showProfile(s);
+  listSiswa.innerHTML='';
+  siswa.forEach(s=>{
+    const div=document.createElement('div');
+    div.className='box';
+    div.innerHTML = `
+      <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
+        style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px">
+      <b>${s.nama}</b><br>
+      <small>${s.jabatan}</small>
+    `;
+    div.onclick = ()=>showProfile(s);
     listSiswa.appendChild(div);
   });
-
-  total.innerText = siswa.length;
-  lk.innerText = siswa.filter(s => s.jk === 'L').length;
-  pr.innerText = siswa.filter(s => s.jk === 'P').length;
+  total.innerText=siswa.length;
+  lk.innerText=siswa.filter(s=>s.jk==='L').length;
+  pr.innerText=siswa.filter(s=>s.jk==='P').length;
 }
 
 function showProfile(s){
@@ -706,32 +609,7 @@ function showProfile(s){
     <b>Jenis Kelamin:</b> ${s.jk}<br>
     <b>Hobi:</b> ${s.hobi || '-'}
   `;
-const social = document.getElementById('profileSocial');
-social.innerHTML = '';
 
-if (s.sosmed) {
-
-  if (s.sosmed.ig) {
-    social.innerHTML += `
-      <a href="${s.sosmed.ig}" target="_blank">
-        <img src="IG.png" alt="Instagram">
-      </a>`;
-  }
-
-  if (s.sosmed.tiktok) {
-    social.innerHTML += `
-      <a href="${s.sosmed.tiktok}" target="_blank">
-        <img src="TIKTOK.png" alt="TikTok">
-      </a>`;
-  }
-
-  if (s.sosmed.fb) {
-    social.innerHTML += `
-      <a href="${s.sosmed.fb}" target="_blank">
-        <img src="FB.png" alt="Facebook">
-      </a>`;
-  }
-}
   const videoWrap = document.getElementById('profileVideoWrapper');
   if(s.video && s.video.length){
     videoWrap.innerHTML = `<div class="slider-video">${s.video.map((v,i)=>`
