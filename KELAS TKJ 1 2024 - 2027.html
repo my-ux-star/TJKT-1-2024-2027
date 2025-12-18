@@ -201,30 +201,17 @@ footer {
   align-items: center;
   justify-content: center;
 }
-/* PROFILE PARALLAX */
+/* Profile Parallax Modern */
 #profile {
   position: relative;
-  overflow: hidden;
-}
-
-#profile::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-
   background-image: var(--bg-profile);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
-  transform: translateY(var(--parallax, 0)) scale(1.15);
-  transition: transform 0.1s linear;
-
-  filter: blur(6px) brightness(0.8);
-  z-index: 0;
+  transition: background-position 0.1s linear;
 }
 
-/* isi tetap di atas */
+/* Konten tetap di atas */
 #profile > * {
   position: relative;
   z-index: 1;
@@ -624,47 +611,71 @@ div.innerHTML = `
   pr.innerText=siswa.filter(s=>s.jk==='P').length;
 }
 
-function showProfile(s){
-  stopProfileVideo();
+// ===== GLOBAL PARALLAX SCROLL =====
+window.addEventListener('scroll', ()=>{
+  const profilePage = document.getElementById('profile');
+  if (!profilePage.dataset.bgimg) return; // hanya jika ada bg image
+  const scrollY = window.scrollY;
+  profilePage.style.backgroundPosition = `center ${scrollY * 0.3}px`;
+});
 
+function showProfile(s) {
+  stopProfileVideo();
   const profilePage = document.getElementById('profile');
 
-  profilePage.style.setProperty(
-    '--bg-profile',
-    s.bg ? `url('${s.bg}')` : "url('https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6')"
-  );
+  // ===== BACKGROUND =====
+  if (s.bg && s.bg.trim() !== '') {
+    profilePage.style.backgroundImage = `url('${s.bg}')`;
+    profilePage.style.backgroundSize = 'cover';
+    profilePage.style.backgroundPosition = 'center';
+    profilePage.dataset.bgimg = 'true'; // tandai ada bg
+  } else {
+    profilePage.style.backgroundImage = 'linear-gradient(135deg,#0f2027,#203a43,#2c5364)';
+    profilePage.style.backgroundSize = 'cover';
+    profilePage.style.backgroundPosition = 'center';
+    profilePage.dataset.bgimg = ''; // hapus tanda parallax
+  }
+
+  // ===== MEDIA PROFILE =====
   document.getElementById('profileMedia').innerHTML = `
     <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
       onclick="openFullscreen(this)">
   `;
+
   document.getElementById('profileName').innerText = s.nama;
   document.getElementById('profileInfo').innerHTML = `
     <b>Jabatan:</b> ${s.jabatan}<br>
     <b>Jenis Kelamin:</b> ${s.jk}<br>
     <b>Hobi:</b> ${s.hobi || '-'}
   `;
-// Sosial Media
-let sosmedHTML = '';
-if(s.sosmed){
-  sosmedHTML = '<div style="margin-top:15px; display:flex; justify-content:center; gap:15px">';
-  if(s.sosmed.ig) sosmedHTML += `<a href="${s.sosmed.ig}" target="_blank"><img src="IG.png" style="width:32px;height:32px"></a>`;
-  if(s.sosmed.tiktok) sosmedHTML += `<a href="${s.sosmed.tiktok}" target="_blank"><img src="TIKTOK.png" style="width:32px;height:32px"></a>`;
-  if(s.sosmed.fb) sosmedHTML += `<a href="${s.sosmed.fb}" target="_blank"><img src="FB.png" style="width:32px;height:32px"></a>`;
-  sosmedHTML += '</div>';
-}
-document.getElementById('profileInfo').innerHTML += sosmedHTML;
 
+  // ===== SOSIAL MEDIA =====
+  let sosmedHTML = '';
+  if(s.sosmed){
+    sosmedHTML = '<div style="margin-top:15px; display:flex; justify-content:center; gap:15px">';
+    if(s.sosmed.ig) sosmedHTML += `<a href="${s.sosmed.ig}" target="_blank"><img src="IG.png" style="width:64px;height:64px"></a>`;
+    if(s.sosmed.tiktok) sosmedHTML += `<a href="${s.sosmed.tiktok}" target="_blank"><img src="TIKTOK.png" style="width:64px;height:64px"></a>`;
+    if(s.sosmed.fb) sosmedHTML += `<a href="${s.sosmed.fb}" target="_blank"><img src="FB.png" style="width:64px;height:64px"></a>`;
+    sosmedHTML += '</div>';
+  }
+  document.getElementById('profileInfo').innerHTML += sosmedHTML;
+
+  // ===== VIDEO PROFILE =====
   const videoWrap = document.getElementById('profileVideoWrapper');
   if(s.video && s.video.length){
-    videoWrap.innerHTML = `<div class="slider-video">${s.video.map((v,i)=>`
-      <div class="video-slide ${i===0?'active':''}">
-        <video class="gif-video" autoplay loop muted playsinline>
-          <source src="${v}" type="video/mp4">
-        </video>
+    videoWrap.innerHTML = `
+      <div class="slider-video">
+        ${s.video.map((v,i)=>`
+          <div class="video-slide ${i===0?'active':''}">
+            <video class="gif-video" autoplay loop muted playsinline>
+              <source src="${v}" type="video/mp4">
+            </video>
+          </div>
+        `).join('')}
       </div>
-    `).join('')}</div>
-    <div class="video-indicators"></div>`;
-    
+      <div class="video-indicators"></div>
+    `;
+
     videoSlides = videoWrap.querySelectorAll('.video-slide');
     currentVideoIndex = 0;
 
@@ -679,6 +690,7 @@ document.getElementById('profileInfo').innerHTML += sosmedHTML;
       if(startX-endX>50) nextVideo();
       if(endX-startX>50) prevVideo();
     });
+
   } else {
     videoWrap.innerHTML='';
     videoSlides=[];
@@ -780,20 +792,6 @@ setInterval(()=>{
   });
 },3000);
 };
-
-// PARALLAX SCROLL PROFILE
-const profilePage = document.getElementById('profile');
-
-window.addEventListener('scroll', () => {
-  if (profilePage.style.display !== 'block') return;
-
-  const scrollY = window.scrollY;
-  profilePage.style.setProperty(
-    '--parallax',
-    `${scrollY * 0.15}px`
-  );
-});
-
 </script>
 
 </body>
