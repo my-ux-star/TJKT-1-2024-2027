@@ -201,27 +201,12 @@ footer {
   align-items: center;
   justify-content: center;
 }
-/* PROFILE PARALLAX */
 #profile {
   position: relative;
   overflow: hidden;
-}
-
-#profile::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-
-  background-image: var(--bg-profile);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
-  transform: translateY(var(--parallax, 0)) scale(1.15);
-  transition: transform 0.1s linear;
-
-  filter: blur(3px) brightness(0.8);
-  z-index: 0;
 }
 
 /* isi tetap di atas */
@@ -680,10 +665,11 @@ function showProfile(s){
 
   const profilePage = document.getElementById('profile');
 
-  profilePage.style.setProperty(
-    '--bg-profile',
-    s.bg ? `url('${s.bg}')` : "url('https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6')"
-  );
+  profilePage.style.backgroundImage =
+  s.bg
+    ? `url('${s.bg}')`
+    : "url('https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6')";
+    
   document.getElementById('profileMedia').innerHTML = `
     <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
       onclick="openFullscreen(this)">
@@ -846,21 +832,6 @@ setInterval(()=>{
   });
 },3000);
 };
-
-// PARALLAX SCROLL PROFILE
-const profilePage = document.getElementById('profile');
-
-window.addEventListener('scroll', () => {
-  if (profilePage.style.display !== 'block') return;
-
-  const scrollY = window.scrollY;
-  profilePage.style.setProperty(
-    '--parallax',
-    `${scrollY * 0.15}px`
-  );
-});
-
 </script>
-
 </body>
 </html>
