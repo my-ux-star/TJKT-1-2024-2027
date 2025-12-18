@@ -539,11 +539,12 @@ const siswa=[
   hobi:'GAMING & CODING',
   jabatan:'Anggota',
   foto:'RIFALDI.png',
+  box:'RIFALDIBOX.png',
   bg:'RIFALDI.jpg',
   video:['RIFALDI.mp4','RIFALDI2.mp4','RIFALDI3.mp4'],
   sosmed:{
     ig:'https://www.instagram.com/m.rifaldi.k?igsh=MXF4a3h1MnlnaWU4eQ==',
-    tiktok:'tiktok.com/@aldirifaldi72',
+    tiktok:'https://www.tiktok.com/@aldirifaldi72?_r=1&_t=ZS-92KBwxs6iIu',
     fb:'https://www.facebook.com/aldirifaldi.aldirifaldi.10'}},
   {nama:'NAWA AZKIA',
   jk:'P',
@@ -580,7 +581,8 @@ const siswa=[
   jk:'P',
   hobi:'Nonton Anime',
   jabatan:'Anggota',
-  foto:'ririny.png',video:['ririny.mp4']},
+  foto:'ririny.png',
+  video:['ririny.mp4']},
   {nama:'RIZKY WIJAYA',
   jk:'L',
   hobi:'',
@@ -641,22 +643,48 @@ menuBtn.addEventListener('click',()=>{ menu.style.display = menu.style.display==
 menu.querySelectorAll('div').forEach(item=>{ item.addEventListener('click',()=>navigate(item.dataset.page)); });
 
 function loadSiswa(){
-  listSiswa.innerHTML='';
-  siswa.forEach(s=>{
-    const div=document.createElement('div');
-    div.className='box';
-    div.innerHTML = `
-      <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}"
-        style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px">
-      <b>${s.nama}</b><br>
-      <small>${s.jabatan}</small>
-    `;
-    div.onclick = ()=>showProfile(s);
+  listSiswa.innerHTML = '';
+  siswa.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'box';
+
+    // Gunakan properti box sebagai background, kalau kosong pakai default
+    div.style.background = s.box 
+      ? `url('${s.box}') center/cover no-repeat` 
+      : `url('https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png') center/cover no-repeat`;
+
+    div.style.color = '#fff';
+    div.style.display = 'flex';
+    div.style.flexDirection = 'column';
+    div.style.justifyContent = 'flex-end';
+    div.style.alignItems = 'center';
+    div.style.padding = '10px';
+    div.style.height = '180px';
+    div.style.borderRadius = '15px';
+    div.style.boxShadow = '0 6px 20px rgba(0,0,0,.3)';
+
+    // Tambahkan overlay supaya teks lebih jelas
+    const overlay = document.createElement('div');
+    overlay.style.position = 'absolute';
+    overlay.style.inset = '0';
+    overlay.style.background = 'rgba(0,0,0,0.35)';
+    overlay.style.borderRadius = '15px';
+    div.appendChild(overlay);
+
+    // Teks di atas overlay
+    const text = document.createElement('div');
+    text.style.position = 'relative';
+    text.style.zIndex = '1';
+    text.innerHTML = `<b>${s.nama}</b><br><small>${s.jabatan}</small>`;
+    div.appendChild(text);
+
+    div.onclick = () => showProfile(s);
     listSiswa.appendChild(div);
   });
-  total.innerText=siswa.length;
-  lk.innerText=siswa.filter(s=>s.jk==='L').length;
-  pr.innerText=siswa.filter(s=>s.jk==='P').length;
+
+  total.innerText = siswa.length;
+  lk.innerText = siswa.filter(s => s.jk === 'L').length;
+  pr.innerText = siswa.filter(s => s.jk === 'P').length;
 }
 
 function showProfile(s){
