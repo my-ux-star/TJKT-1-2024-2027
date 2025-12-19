@@ -413,37 +413,6 @@ footer {
   outline: 3px solid rgba(0,255,255,0.45);
   outline-offset: -3px;
 }
-
-/* default = mute */
-.mute-icon{
-  position:absolute;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:6;
-  pointer-events:none;
-  opacity:1;
-  transition:.25s;
-}
-
-.mute-icon::before{
-  content:'';
-  width:60px;
-  height:60px;
-  background-size:contain;
-  background-repeat:no-repeat;
-  background-image:url('mute.png');
-}
-
-/* SOUND ON */
-.tiktok-item.sound-on .mute-icon{
-  opacity:0;
-}
-
-.tiktok-item.sound-on .mute-icon::before{
-  background-image:url('sound.png');
-}
 </style>
 </head>
 <body>
@@ -990,12 +959,6 @@ setInterval(()=>{
 },3000);
 };
 function loadTikTokFeed(){
-  document.addEventListener('click', e=>{
-  const item = e.target.closest('.tiktok-item');
-  if(item){
-    toggleMute(item);
-  }
-});
   const feed = document.getElementById('tiktokFeed');
   feed.innerHTML = '';
 
@@ -1059,24 +1022,6 @@ function openProfileFromFeed(nama){
 }
 let currentSoundVideo = null;
 
-// TAP VIDEO = PLAY + UNMUTE, MATIKAN VIDEO LAIN
-function toggleMute(item){
-
-  const video = item.querySelector('video');
-
-  // MATIKAN SEMUA VIDEO LAIN
-  document.querySelectorAll('.tiktok-item').forEach(el=>{
-    el.classList.remove('sound-on');
-    const v = el.querySelector('video');
-    v.muted = true;
-  });
-
-  // AKTIFKAN VIDEO INI
-  video.muted = false;
-  video.play();
-  item.classList.add('sound-on');
-}
-
 function enableFullscreenAutoplay(){
   const observer = new IntersectionObserver(entries=>{
     entries.forEach(e=>{
@@ -1122,7 +1067,6 @@ function centerClosestVideo(){
 
     const rect = item.getBoundingClientRect();
     const itemCenter = rect.top + rect.height / 2;
-
     const distance = Math.abs(feedCenter - itemCenter);
 
     if(distance < closestDistance){
@@ -1131,13 +1075,17 @@ function centerClosestVideo(){
     }
   });
 
+  // MATIKAN SEMUA VIDEO
   document.querySelectorAll('.tiktok-item video').forEach(v=>{
     v.pause();
+    v.muted = true;
   });
 
+  // AKTIFKAN VIDEO TENGAH
   if(closest){
     const video = closest.querySelector('video');
     if(video){
+      video.muted = false;
       video.play();
     }
 
