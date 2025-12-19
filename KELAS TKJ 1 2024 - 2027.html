@@ -526,7 +526,7 @@ footer {
   height: 54px;
 
   border-radius: 50%;
-  overflow: hidden;
+  overflow: visible; /* ✅ PENTING */
 
   border: 3px solid white;
   background: #000;
@@ -539,6 +539,7 @@ footer {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%; /* foto tetap bulat */
 }
 .feed-avatar:active{
   transform: scale(0.92);
@@ -566,6 +567,56 @@ footer {
   border-radius: 50%;
   box-shadow: 0 2px 6px rgba(0,0,0,.6);
 }
+/* VERIFIED DI NAMA */
+.tiktok-name{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.name-verified{
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+}
+
+.name-verified svg{
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+/* ACTION BUTTONS (LIKE & COMMENT) */
+.action-btns{
+  position: absolute;
+  right: 12px;
+  bottom: 160px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  z-index: 12;
+}
+
+.action-btns div{
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(6px);
+  padding: 8px 10px;
+  border-radius: 20px;
+
+  font-size: 15px;
+  cursor: pointer;
+  user-select: none;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.like-btn.active{
+  color: #ff2d55;
+  transform: scale(1.15);
+}
 </style>
 </head>
 <body>
@@ -589,19 +640,18 @@ footer {
 
 <section>
   <div class="page" id="home">
+        <h2>Selamat Datang di Kelas TKJ 1</h2>
+  
+  <p>
+    Website resmi <b>KELAS TKJ 1 ANGKATAN 2024–2027</b>.<br>
+    Di sini kamu bisa melihat profil anggota kelas, struktur organisasi, momen kelas, dan dashboard statistik.
+  </p>
   <div id="tiktokFullscreenWrapper">
   <div class="tiktok-feed" id="tiktokFeed"></div>
   </div>
   </div>
 
   <div class="card page" id="about">
-  <h2>Selamat Datang di Kelas TKJ 1</h2>
-  
-  <p>
-    Website resmi <b>KELAS TKJ 1 ANGKATAN 2024–2027</b>.<br>
-    Di sini kamu bisa melihat profil anggota kelas, struktur organisasi, momen kelas, dan dashboard statistik.
-  </p>
-
     <!-- SLIDER FOTO -->
     <div class="slider">
       <img class="slide active" src="1.jpg">
@@ -1133,7 +1183,7 @@ feed.innerHTML = `
     s.video.forEach(v => {
       const item = document.createElement('div');
       item.className = 'tiktok-item';
-
+item.dataset.id = s.nama + '_' + v;
       item.innerHTML = `
   <video src="${v}" muted loop playsinline></video>
 
@@ -1156,11 +1206,30 @@ feed.innerHTML = `
   <div class="sound-btn">
     <img src="mute.png">
   </div>
-
-  <div class="tiktok-info">
-    <b>${s.nama}</b><br>
-    <small>${s.jabatan}</small>
+<!-- ACTION BUTTONS -->
+<div class="action-btns">
+  <div class="like-btn">
+    ❤️ <span class="like-count">0</span>
   </div>
+  <div class="comment-btn">
+    💬 <span class="comment-count">0</span>
+  </div>
+</div>
+<div class="tiktok-info">
+  <div class="tiktok-name">
+    <b>${s.nama}</b>
+    ${s.verified ? `
+      <span class="name-verified">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="12" fill="#1da1f2"/>
+          <path d="M9.5 12.8l-2-2a1 1 0 0 1 1.4-1.4l1.3 1.3 4-4a1 1 0 1 1 1.4 1.4l-4.7 4.7a1 1 0 0 1-1.4 0z"
+                fill="#fff"/>
+        </svg>
+      </span>
+    ` : ''}
+  </div>
+  <small>${s.jabatan}</small>
+</div>
 `;
 
       feed.appendChild(item);
@@ -1323,7 +1392,96 @@ function toggleFeedFullscreen(){
   // biar video tengah langsung update
   setTimeout(centerClosestVideo, 200);
 }
-</script>
+let activeVideoId = null;
 
+function getStore(id){
+  return JSON.parse(localStorage.getItem(id)) || {likes:0, comments:[]};
+}
+
+function saveStore(id,data){
+  localStorage.setItem(id, JSON.stringify(data));
+}
+
+document.addEventListener('click', e=>{
+  const item = e.target.closest('.tiktok-item');
+  if(!item) return;
+
+  const videoId = item.dataset.id;
+  const likeBtn = item.querySelector('.like-btn');
+  const likeCount = item.querySelector('.like-count');
+  const commentBtn = item.querySelector('.comment-btn');
+  const commentCount = item.querySelector('.comment-count');
+
+  if(likeBtn && likeBtn.contains(e.target)){
+    let data = getStore(videoId);
+    data.likes++;
+    saveStore(videoId,data);
+    likeCount.textContent = data.likes;
+    likeBtn.classList.add('active');
+  }
+
+  if(commentBtn && commentBtn.contains(e.target)){
+    activeVideoId = videoId;
+    openComment(videoId);
+  }
+});
+
+function openComment(id){
+  const data = getStore(id);
+  document.getElementById('commentList').innerHTML =
+    data.comments.map(c=>`<div>• ${c}</div>`).join('');
+  document.getElementById('commentPopup').style.display='block';
+}
+
+function closeComment(){
+  document.getElementById('commentPopup').style.display='none';
+}
+
+function sendComment(){
+  const input = document.getElementById('commentInput');
+  if(!input.value) return;
+
+  let data = getStore(activeVideoId);
+  data.comments.push(input.value);
+  saveStore(activeVideoId,data);
+
+  input.value='';
+  openComment(activeVideoId);
+
+  document.querySelectorAll('.tiktok-item').forEach(item=>{
+    if(item.dataset.id === activeVideoId){
+      item.querySelector('.comment-count').textContent = data.comments.length;
+    }
+  });
+}
+</script>
+<div id="commentPopup" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.75);
+z-index:99999;
+">
+  <div style="
+  background:#111;
+  max-width:420px;
+  margin:80px auto;
+  border-radius:16px;
+  padding:16px;
+  ">
+    <h3>Komentar</h3>
+    <div id="commentList" style="max-height:260px;overflow:auto;margin:10px 0"></div>
+    <input id="commentInput" placeholder="Tulis komentar..."
+      style="width:100%;padding:10px;border-radius:10px;border:none">
+    <button onclick="sendComment()"
+      style="margin-top:10px;width:100%;padding:10px;border-radius:10px">
+      Kirim
+    </button>
+    <button onclick="closeComment()"
+      style="margin-top:8px;width:100%;padding:8px;border-radius:10px">
+      Tutup
+    </button>
+  </div>
+</div>
 </body>
 </html>
