@@ -617,6 +617,40 @@ footer {
   color: #ff2d55;
   transform: scale(1.15);
 }
+/* ===== MENU ATAS ===== */
+.top-menu{
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.top-menu button{
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+
+  background: rgba(255,255,255,.18);
+  color: white;
+  font-size: 0.9rem;
+
+  transition: 0.3s;
+}
+
+.top-menu button:hover{
+  background: rgba(255,255,255,.35);
+  transform: translateY(-2px);
+}
+
+/* Mobile lebih rapat */
+@media (max-width:600px){
+  .top-menu button{
+    font-size: 0.8rem;
+    padding: 7px 12px;
+  }
+}
 </style>
 </head>
 <body>
@@ -626,16 +660,15 @@ footer {
   <h1>KELAS TKJ 1<br>ANGKATAN 2024–2027</h1>
   <p>Teknik Komputer dan Jaringan</p>
 
-  <div class="menu-btn" id="menuBtn">⋮</div>
-  <div class="dropdown" id="menu">
-    <div data-page="home">beranda</div>
-    <div data-page="about">tentang</div>
-    <div data-page="wali">Wali Kelas</div>
-    <div data-page="struktur">Struktur Kelas</div>
-    <div data-page="anggota">Anggota Kelas</div>
-    <div data-page="dashboard">Dashboard</div>
-    <div data-page="moment">Moment</div>
-  </div>
+  <nav class="top-menu">
+  <button onclick="navigate('home')">Beranda</button>
+  <button onclick="navigate('about')">Tentang</button>
+  <button onclick="navigate('wali')">Wali Kelas</button>
+  <button onclick="navigate('struktur')">Struktur</button>
+  <button onclick="navigate('anggota')">Anggota</button>
+  <button onclick="navigate('dashboard')">Dashboard</button>
+  <button onclick="navigate('moment')">Moment</button>
+</nav>
 </header>
 
 <section>
@@ -945,9 +978,6 @@ const siswa=[
   jabatan:'Anggota',
   foto:''}
 ];
-
-const menuBtn=document.getElementById('menuBtn');
-const menu=document.getElementById('menu');
 const listSiswa=document.getElementById('listSiswa');
 const total=document.getElementById('total');
 const lk=document.getElementById('lk');
@@ -965,9 +995,6 @@ function navigate(id){
   location.hash=id;
   menu.style.display='none';
 }
-
-menuBtn.addEventListener('click',()=>{ menu.style.display = menu.style.display==='block'?'none':'block'; });
-menu.querySelectorAll('div').forEach(item=>{ item.addEventListener('click',()=>navigate(item.dataset.page)); });
 
 function loadSiswa(){
   listSiswa.innerHTML='';
