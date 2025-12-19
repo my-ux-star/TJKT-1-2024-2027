@@ -850,6 +850,7 @@ const total=document.getElementById('total');
 const lk=document.getElementById('lk');
 const pr=document.getElementById('pr');
 
+let userMutedVideo = null;
 let currentVideoIndex = 0;
 let videoSlides = [];
 
@@ -1074,7 +1075,7 @@ function loadTikTokFeed(){
   videoSiswa.sort(() => Math.random() - 0.5);
 feed.innerHTML = `
   <div class="feed-fullscreen-btn" onclick="toggleFeedFullscreen()">
-    <img src="fullscreen.png">
+    <img src="Fullscreen.png">
   </div>
 `;
   videoSiswa.forEach(s => {
@@ -1111,23 +1112,17 @@ videoEl.muted = true;
 soundImg.src = 'mute.png';
 
 soundBtn.addEventListener('click', (e)=>{
-  e.stopPropagation(); // ❗ jangan trigger klik lain
+  e.stopPropagation();
 
-  // matikan semua video lain
-  document.querySelectorAll('.tiktok-item video').forEach(v=>{
-    v.muted = true;
-  });
-  document.querySelectorAll('.sound-btn img').forEach(img=>{
-    img.src = 'mute.png';
-  });
-
-  // toggle video ini
+  // toggle manual mute
   if(videoEl.muted){
     videoEl.muted = false;
     soundImg.src = 'sound.png';
+    userMutedVideo = null;
   }else{
     videoEl.muted = true;
     soundImg.src = 'mute.png';
+    userMutedVideo = videoEl; // 🔒 kunci manual mute
   }
 });
 
@@ -1245,9 +1240,13 @@ function centerClosestVideo(){
   const img = closest.querySelector('.sound-btn img');
 
   if(video){
-    video.muted = false;
     video.play();
-    img.src = 'sound.png';
+
+// hanya auto-unmute jika BUKAN hasil manual mute
+if(video !== userMutedVideo){
+  video.muted = false;
+  img.src = 'sound.png';
+}
   }
 
   feed.scrollTo({
