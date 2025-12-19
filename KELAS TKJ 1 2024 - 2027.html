@@ -331,43 +331,146 @@ footer {
   border-radius: 20px;
 }
 /* ===== TIKTOK STYLE FEED ===== */
+/* FULLSCREEN TIKTOK MODE */
+/* ===== TIKTOK FEED MODE CARD (BUKAN FULLSCREEN) ===== */
 .tiktok-feed{
-  height: 75vh;
-  max-width: 420px;
-  margin: 0 auto;
+  position: relative;        /* BUKAN fixed */
+  width: 100%;
+  max-width: 420px;          /* ukuran seperti HP */
+  height: 70vh;              /* tidak fullscreen */
+  margin: 20px auto;
+
   overflow-y: auto;
-  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+
   border-radius: 20px;
+  padding: 10px;
+
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+
+  border: 3px solid rgba(255,255,255,0.35);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+
+  z-index: 1;                /* DI BAWAH MENU */
 }
 
+/* CARD / KOTAK */
 .tiktok-item{
-  height: 75vh;
-  scroll-snap-align: start;
   position: relative;
+
+  width: 100%;
+  height: 70vh;              /* 1 video = 1 layar card */
+  max-height: 520px;         /* aman di HP besar */
+
+  margin-bottom: 20px;
+  border-radius: 20px;
+  overflow: hidden;
+
+  background: #000;
+
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.6),
+    inset 0 0 15px rgba(255,255,255,0.15);
 }
 
 .tiktok-item video{
+  position: absolute;
+  inset: 0;
+
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  border-radius: 20px;
+
+  object-fit: cover;    /* mirip TikTok asli */
+}
+.tiktok-item{
+  background: radial-gradient(circle at center, #111, #000);
 }
 
 /* info video */
 .tiktok-info{
   position: absolute;
-  bottom: 15px;
-  left: 15px;
-  right: 15px;
-  background: linear-gradient(transparent,rgba(0,0,0,.6));
-  padding: 10px;
-  border-radius: 15px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  padding: 14px;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.7),
+    transparent
+  );
+
+  z-index: 5;
 }
 
 .tiktok-info b{
   font-size: 1rem;
 }
+.tiktok-item::after{
+  content:'🔇';
+  position:absolute;
+  top:15px;
+  right:15px;
+  font-size:22px;
+  opacity:.8;
+  pointer-events:none;
+}
 
+.tiktok-item video:not([muted]) + .tiktok-info{
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
+}
+/* ===== CUSTOM MUTE ICON ===== */
+.mute-icon{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%) scale(0.8);
+
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition: 0.3s ease;
+}
+
+/* ICON GAMBAR */
+.mute-icon::before{
+  content: '';
+  width: 32px;
+  height: 32px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* MUTE */
+.tiktok-item video[muted] + .tiktok-info,
+.tiktok-item video[muted] ~ .mute-icon{
+  opacity: 1;
+}
+.tiktok-item video[muted] ~ .mute-icon::before{
+  background-image: url('mute.png'); /* icon speaker off */
+}
+
+/* UNMUTE */
+.tiktok-item video:not([muted]) ~ .mute-icon{
+  opacity: 0.9;
+  transform: translate(-50%,-50%) scale(1);
+}
+.tiktok-item video:not([muted]) ~ .mute-icon::before{
+  background-image: url('sound.png'); /* icon speaker on */
+}
 </style>
 </head>
 <body>
@@ -379,7 +482,8 @@ footer {
 
   <div class="menu-btn" id="menuBtn">⋮</div>
   <div class="dropdown" id="menu">
-    <div data-page="beranda">Beranda</div>
+    <div data-page="home">beranda</div>
+    <div data-page="about">tentang</div>
     <div data-page="wali">Wali Kelas</div>
     <div data-page="struktur">Struktur Kelas</div>
     <div data-page="anggota">Anggota Kelas</div>
@@ -389,7 +493,11 @@ footer {
 </header>
 
 <section>
-  <div class="card page" id="beranda">
+  <div class="page" id="home">
+  <div class="tiktok-feed" id="tiktokFeed"></div>
+</div>
+
+  <div class="card page" id="about">
   <h2>Selamat Datang di Kelas TKJ 1</h2>
   
   <p>
@@ -403,9 +511,6 @@ footer {
       <img class="slide" src="2.jpg">
       <img class="slide" src="3.jpg">
     </div>
-    <h3 style="margin-top:30px;">Video Random</h3>
-
-<div class="tiktok-feed" id="tiktokFeed"></div>
 
      <h3 style="margin-top:25px;">Sejarah Singkat Kelas</h3>
   <p>
@@ -880,7 +985,7 @@ function openFullscreen(el){
 
 window.onload=()=>{
   loadSiswa();
-  navigate(location.hash.replace('#','')||'beranda');
+  navigate(location.hash.replace('#','')||'home');
   
   // slider gambar beranda
  const slides = document.querySelectorAll('.slide');
@@ -927,14 +1032,25 @@ function loadTikTokFeed(){
       item.className = 'tiktok-item';
 
       item.innerHTML = `
-        <video src="${v}" muted autoplay loop playsinline></video>
-        <div class="tiktok-info">
-          <b>${s.nama}</b><br>
-          <small>${s.jabatan}</small>
-        </div>
-      `;
+  <div class="mute-icon"></div>
+
+  <video 
+    src="${v}" 
+    muted 
+    autoplay 
+    loop 
+    playsinline
+    onclick="toggleMute(this)">
+  </video>
+
+  <div class="tiktok-info" onclick="openProfileFromFeed('${s.nama}')">
+    <b>${s.nama}</b><br>
+    <small>${s.jabatan}</small>
+  </div>
+`;
 
       feed.appendChild(item);
+      enableFullscreenAutoplay();
     });
   });
 
@@ -955,9 +1071,129 @@ function loadTikTokFeed(){
     observer.observe(item);
   });
 }
-
-// panggil saat halaman dibuka
 window.addEventListener('load', loadTikTokFeed);
+// TAP VIDEO = MUTE / UNMUTE
+function toggleMute(video){
+
+  // matikan semua video lain
+  document.querySelectorAll('.tiktok-item video').forEach(v=>{
+    if(v !== video){
+      v.muted = true;
+      v.pause();
+      v.currentTime = 0;
+    }
+  });
+
+  // toggle video ini
+  video.muted = !video.muted;
+
+  if(!video.muted){
+    video.play();
+  }
+}
+
+// KLIK INFO = BUKA PROFIL SISWA
+function openProfileFromFeed(nama){
+  const s = siswa.find(x => x.nama === nama);
+  if(s){
+    showProfile(s);
+  }
+}
+let currentSoundVideo = null;
+
+// TAP VIDEO = PLAY + UNMUTE, MATIKAN VIDEO LAIN
+function toggleMute(video){
+
+  // jika video ini sedang mute → aktifkan
+  if(video.muted){
+    // matikan semua video lain
+    document.querySelectorAll('.tiktok-item video').forEach(v=>{
+      v.muted = true;
+      v.pause();
+      v.currentTime = 0;
+    });
+
+    video.muted = false;
+    video.play();
+    currentSoundVideo = video;
+  } 
+  // jika sudah unmute → mute lagi
+  else {
+    video.muted = true;
+    video.pause();
+    currentSoundVideo = null;
+  }
+}
+function enableFullscreenAutoplay(){
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      const video = e.target.querySelector('video');
+
+      if(e.isIntersecting){
+        video.play();
+      }else{
+        video.pause();
+        video.currentTime = 0;
+        video.muted = true;
+      }
+    });
+  },{threshold:0.8});
+
+  document.querySelectorAll('.tiktok-item').forEach(item=>{
+    observer.observe(item);
+  });
+}
+let tiktokScrollTimer = null;
+
+const feed = document.querySelector('.tiktok-feed');
+
+feed.addEventListener('scroll', () => {
+
+  // reset timer tiap scroll
+  clearTimeout(tiktokScrollTimer);
+
+  tiktokScrollTimer = setTimeout(() => {
+    centerClosestVideo();
+  }, 120); // jeda setelah scroll berhenti
+});
+
+function centerClosestVideo(){
+
+  const feedRect = feed.getBoundingClientRect();
+  const feedCenter = feedRect.top + feedRect.height / 2;
+
+  let closest = null;
+  let closestDistance = Infinity;
+
+  document.querySelectorAll('.tiktok-item').forEach(item => {
+
+    const rect = item.getBoundingClientRect();
+    const itemCenter = rect.top + rect.height / 2;
+
+    const distance = Math.abs(feedCenter - itemCenter);
+
+    if(distance < closestDistance){
+      closestDistance = distance;
+      closest = item;
+    }
+  });
+
+  document.querySelectorAll('.tiktok-item video').forEach(v=>{
+    v.pause();
+  });
+
+  if(closest){
+    const video = closest.querySelector('video');
+    if(video){
+      video.play();
+    }
+
+    feed.scrollTo({
+      top: closest.offsetTop - feed.clientHeight/2 + closest.clientHeight/2,
+      behavior: 'smooth'
+    });
+  }
+}
 </script>
 
 </body>
