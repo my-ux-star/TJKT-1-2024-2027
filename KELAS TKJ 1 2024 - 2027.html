@@ -378,11 +378,19 @@ footer {
 .tiktok-item video{
   position: absolute;
   inset: 0;
-
   width: 100%;
   height: 100%;
+  background: #000;
+}
 
-  object-fit: cover;    /* mirip TikTok asli */
+/* default */
+.tiktok-item video.cover{
+  object-fit: cover;
+}
+
+/* ❗ untuk 1:1 & landscape (tidak zoom) */
+.tiktok-item video.contain{
+  object-fit: contain;
 }
 .tiktok-item{
   background: radial-gradient(circle at center, #111, #000);
@@ -990,6 +998,22 @@ function loadTikTokFeed(){
 `;
 
       feed.appendChild(item);
+      const videoEl = item.querySelector('video');
+
+videoEl.addEventListener('loadedmetadata', () => {
+  const ratio = videoEl.videoWidth / videoEl.videoHeight;
+
+  if (ratio >= 0.95 && ratio <= 1.05) {
+    // VIDEO 1:1
+    videoEl.classList.add('contain');
+  } else if (ratio > 1) {
+    // LANDSCAPE
+    videoEl.classList.add('contain');
+  } else {
+    // PORTRAIT (9:16)
+    videoEl.classList.add('cover');
+  }
+});
       enableFullscreenAutoplay();
     });
   });
