@@ -416,28 +416,32 @@ footer {
 
 /* default = mute */
 .mute-icon{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:6;
+  pointer-events:none;
   opacity:1;
+  transition:.25s;
 }
 
 .mute-icon::before{
+  content:'';
+  width:60px;
+  height:60px;
+  background-size:contain;
+  background-repeat:no-repeat;
   background-image:url('mute.png');
 }
 
 /* SOUND ON */
-video[data-sound] + .mute-icon{
+.tiktok-item.sound-on .mute-icon{
   opacity:0;
 }
 
-/* efek fade */
-.mute-icon{
-  transition: opacity .25s ease;
-}
-
-/* SOUND ON */
-video:not([muted]) + .mute-icon{
-  opacity:.9;
-}
-video:not([muted]) + .mute-icon::before{
+.tiktok-item.sound-on .mute-icon::before{
   background-image:url('sound.png');
 }
 </style>
@@ -986,6 +990,12 @@ setInterval(()=>{
 },3000);
 };
 function loadTikTokFeed(){
+  document.addEventListener('click', e=>{
+  const item = e.target.closest('.tiktok-item');
+  if(item){
+    toggleMute(item);
+  }
+});
   const feed = document.getElementById('tiktokFeed');
   feed.innerHTML = '';
 
@@ -1002,13 +1012,11 @@ function loadTikTokFeed(){
 
       item.innerHTML = `
   <video 
-    src="${v}" 
-    muted 
-    autoplay 
-    loop 
-    playsinline
-    onclick="toggleMute(this)">
-  </video>
+  src="${v}" 
+  muted 
+  loop 
+  playsinline
+></video>
 
   <div class="mute-icon"></div>
 
@@ -1052,26 +1060,21 @@ function openProfileFromFeed(nama){
 let currentSoundVideo = null;
 
 // TAP VIDEO = PLAY + UNMUTE, MATIKAN VIDEO LAIN
-function toggleMute(video){
+function toggleMute(item){
 
-  // matikan semua video lain
-  document.querySelectorAll('.tiktok-item video').forEach(v=>{
+  const video = item.querySelector('video');
+
+  // MATIKAN SEMUA VIDEO LAIN
+  document.querySelectorAll('.tiktok-item').forEach(el=>{
+    el.classList.remove('sound-on');
+    const v = el.querySelector('video');
     v.muted = true;
-    v.pause();
-    v.currentTime = 0;
-    v.removeAttribute('data-sound');
   });
 
-  // toggle video ini
-  if(video.hasAttribute('data-sound')){
-    video.muted = true;
-    video.pause();
-    video.removeAttribute('data-sound');
-  } else {
-    video.muted = false;
-    video.play();
-    video.setAttribute('data-sound','on');
-  }
+  // AKTIFKAN VIDEO INI
+  video.muted = false;
+  video.play();
+  item.classList.add('sound-on');
 }
 
 function enableFullscreenAutoplay(){
