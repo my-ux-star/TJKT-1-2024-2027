@@ -421,6 +421,101 @@ footer {
   outline: 3px solid rgba(0,255,255,0.45);
   outline-offset: -3px;
 }
+.sound-btn{
+  position: absolute;
+  right: 12px;
+  bottom: 90px; /* di atas info nama */
+  z-index: 10;
+
+  width: 46px;
+  height: 46px;
+
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.sound-btn img{
+  width: 26px;
+  height: 26px;
+  pointer-events: none;
+}
+/* ===== FULLSCREEN FEED TIKTOK ===== */
+#tiktokFullscreenWrapper{
+  position: relative;
+}
+
+/* MODE FULLSCREEN */
+#tiktokFullscreenWrapper.active{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  padding: 0;
+}
+
+/* feed saat fullscreen */
+#tiktokFullscreenWrapper.active .tiktok-feed{
+  height: 100vh;
+  max-width: 100%;
+  border-radius: 0;
+}
+.feed-fullscreen-btn{
+  position: sticky;
+  top: 14px;
+  right: 14px;
+  margin-left: auto;
+  margin-right: 14px;
+
+  width: 44px;
+  height: 44px;
+
+  z-index: 20;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.feed-fullscreen-btn img{
+  width: 24px;
+}
+/* ===== MODE FULLSCREEN: 1 VIDEO = 1 LAYAR ===== */
+#tiktokFullscreenWrapper.active .tiktok-feed{
+  height: 100vh;
+}
+
+#tiktokFullscreenWrapper.active .tiktok-item{
+  height: 100vh;
+  border-radius: 0;
+}
+
+/* video benar-benar penuh layar */
+#tiktokFullscreenWrapper.active .tiktok-item video{
+  border-radius: 0;
+}
+#tiktokFullscreenWrapper.active .tiktok-feed{
+  scroll-snap-type: y mandatory;
+}
+
+#tiktokFullscreenWrapper.active .tiktok-item{
+  scroll-snap-align: start;
+}
+#tiktokFullscreenWrapper.active .tiktok-feed{
+  border: none;
+  box-shadow: none;
+}
 </style>
 </head>
 <body>
@@ -444,8 +539,10 @@ footer {
 
 <section>
   <div class="page" id="home">
+  <div id="tiktokFullscreenWrapper">
   <div class="tiktok-feed" id="tiktokFeed"></div>
-</div>
+  </div>
+  </div>
 
   <div class="card page" id="about">
   <h2>Selamat Datang di Kelas TKJ 1</h2>
@@ -975,21 +1072,28 @@ function loadTikTokFeed(){
 
   // acak urutan
   videoSiswa.sort(() => Math.random() - 0.5);
-
+feed.innerHTML = `
+  <div class="feed-fullscreen-btn" onclick="toggleFeedFullscreen()">
+    <img src="fullscreen.png">
+  </div>
+`;
   videoSiswa.forEach(s => {
     s.video.forEach(v => {
       const item = document.createElement('div');
       item.className = 'tiktok-item';
 
       item.innerHTML = `
-  <video 
-  src="${v}" 
-  muted 
-  loop 
-  playsinline
-></video>
+  <video src="${v}" muted loop playsinline></video>
 
-  <div class="mute-icon"></div>
+  <!-- TOMBOL FULLSCREEN -->
+  <div class="fullscreen-btn">
+    <img src="fullscreen.png">
+  </div>
+
+  <!-- TOMBOL SOUND -->
+  <div class="sound-btn">
+    <img src="mute.png">
+  </div>
 
   <div class="tiktok-info" onclick="openProfileFromFeed('${s.nama}')">
     <b>${s.nama}</b><br>
@@ -999,6 +1103,33 @@ function loadTikTokFeed(){
 
       feed.appendChild(item);
       const videoEl = item.querySelector('video');
+      const soundBtn = item.querySelector('.sound-btn');
+const soundImg = soundBtn.querySelector('img');
+
+// default: muted
+videoEl.muted = true;
+soundImg.src = 'mute.png';
+
+soundBtn.addEventListener('click', (e)=>{
+  e.stopPropagation(); // ❗ jangan trigger klik lain
+
+  // matikan semua video lain
+  document.querySelectorAll('.tiktok-item video').forEach(v=>{
+    v.muted = true;
+  });
+  document.querySelectorAll('.sound-btn img').forEach(img=>{
+    img.src = 'mute.png';
+  });
+
+  // toggle video ini
+  if(videoEl.muted){
+    videoEl.muted = false;
+    soundImg.src = 'sound.png';
+  }else{
+    videoEl.muted = true;
+    soundImg.src = 'mute.png';
+  }
+});
 
 videoEl.addEventListener('loadedmetadata', () => {
   const ratio = videoEl.videoWidth / videoEl.videoHeight;
@@ -1100,24 +1231,37 @@ function centerClosestVideo(){
   });
 
   // MATIKAN SEMUA VIDEO
-  document.querySelectorAll('.tiktok-item video').forEach(v=>{
-    v.pause();
-    v.muted = true;
-  });
+  document.querySelectorAll('.tiktok-item').forEach(item=>{
+  const v = item.querySelector('video');
+  const img = item.querySelector('.sound-btn img');
+  v.pause();
+  v.muted = true;
+  img.src = 'mute.png';
+});
 
   // AKTIFKAN VIDEO TENGAH
   if(closest){
-    const video = closest.querySelector('video');
-    if(video){
-      video.muted = false;
-      video.play();
-    }
+  const video = closest.querySelector('video');
+  const img = closest.querySelector('.sound-btn img');
 
-    feed.scrollTo({
-      top: closest.offsetTop - feed.clientHeight/2 + closest.clientHeight/2,
-      behavior: 'smooth'
-    });
+  if(video){
+    video.muted = false;
+    video.play();
+    img.src = 'sound.png';
   }
+
+  feed.scrollTo({
+    top: closest.offsetTop - feed.clientHeight/2 + closest.clientHeight/2,
+    behavior: 'smooth'
+  });
+}
+}
+function toggleFeedFullscreen(){
+  const wrap = document.getElementById('tiktokFullscreenWrapper');
+  wrap.classList.toggle('active');
+
+  // biar video tengah langsung update
+  setTimeout(centerClosestVideo, 200);
 }
 </script>
 
