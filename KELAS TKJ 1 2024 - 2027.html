@@ -334,45 +334,45 @@ footer {
 /* FULLSCREEN TIKTOK MODE */
 /* ===== TIKTOK FEED MODE CARD (BUKAN FULLSCREEN) ===== */
 .tiktok-feed{
-  position: relative;        /* BUKAN fixed */
+  position: relative;
   width: 100%;
-  max-width: 420px;          /* ukuran seperti HP */
-  height: 70vh;              /* tidak fullscreen */
+  max-width: 420px;
+
+  height: 70vh;
+  padding: 0;              /* ❗ HILANGKAN PADDING */
   margin: 20px auto;
 
   overflow-y: auto;
-  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
 
   border-radius: 20px;
-  padding: 10px;
-
   background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(10px);
-
-  border: 3px solid rgba(255,255,255,0.35);
-  box-shadow: 0 12px 35px rgba(0,0,0,0.6);
-
-  z-index: 1;                /* DI BAWAH MENU */
 }
 
-/* CARD / KOTAK */
 .tiktok-item{
   position: relative;
-
   width: 100%;
-  height: 70vh;              /* 1 video = 1 layar card */
-  max-height: 520px;         /* aman di HP besar */
+  height: 70vh;            /* ❗ SAMA DENGAN FEED */
+  scroll-snap-align: center;
 
-  margin-bottom: 20px;
+  margin: 0;               /* ❗ HAPUS JARAK */
   border-radius: 20px;
   overflow: hidden;
 
   background: #000;
-
+}
+/* ===== BORDER BERANDA TIKTOK ===== */
+.tiktok-feed{
+  border: 3px solid rgba(255,255,255,0.55);
+  box-shadow:
+    0 12px 35px rgba(0,0,0,0.65),
+    inset 0 0 25px rgba(255,255,255,0.15);
+}
+.tiktok-item{
   border: 2px solid rgba(255,255,255,0.25);
   box-shadow:
-    0 10px 30px rgba(0,0,0,0.6),
-    inset 0 0 15px rgba(255,255,255,0.15);
+    inset 0 0 15px rgba(255,255,255,0.1),
+    0 8px 25px rgba(0,0,0,0.6);
 }
 
 .tiktok-item video{
@@ -408,68 +408,56 @@ footer {
 .tiktok-info b{
   font-size: 1rem;
 }
-.tiktok-item::after{
-  content:'🔇';
-  position:absolute;
-  top:15px;
-  right:15px;
-  font-size:22px;
-  opacity:.8;
-  pointer-events:none;
+
+.tiktok-item video:not([muted]){
+  outline: 3px solid rgba(0,255,255,0.45);
+  outline-offset: -3px;
 }
 
-.tiktok-item video:not([muted]) + .tiktok-info{
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
-}
-/* ===== CUSTOM MUTE ICON ===== */
 .mute-icon{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%) scale(0.8);
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0.9);
 
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
+  width:70px;
+  height:70px;
+  border-radius:50%;
 
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(6px);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  opacity:0;
+  transition:.3s;
+  pointer-events:none;
 
-  opacity: 0;
-  pointer-events: none;
-
-  transition: 0.3s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-/* ICON GAMBAR */
 .mute-icon::before{
-  content: '';
-  width: 32px;
-  height: 32px;
-  background-size: contain;
-  background-repeat: no-repeat;
+  content:'';
+  width:32px;
+  height:32px;
+  background-size:contain;
+  background-repeat:no-repeat;
 }
 
 /* MUTE */
-.tiktok-item video[muted] + .tiktok-info,
-.tiktok-item video[muted] ~ .mute-icon{
-  opacity: 1;
+video[muted] + .mute-icon{
+  opacity:1;
 }
-.tiktok-item video[muted] ~ .mute-icon::before{
-  background-image: url('mute.png'); /* icon speaker off */
+video[muted] + .mute-icon::before{
+  background-image:url('mute.png');
 }
 
-/* UNMUTE */
-.tiktok-item video:not([muted]) ~ .mute-icon{
-  opacity: 0.9;
-  transform: translate(-50%,-50%) scale(1);
+/* SOUND ON */
+video:not([muted]) + .mute-icon{
+  opacity:.9;
 }
-.tiktok-item video:not([muted]) ~ .mute-icon::before{
-  background-image: url('sound.png'); /* icon speaker on */
+video:not([muted]) + .mute-icon::before{
+  background-image:url('sound.png');
 }
 </style>
 </head>
@@ -1032,8 +1020,6 @@ function loadTikTokFeed(){
       item.className = 'tiktok-item';
 
       item.innerHTML = `
-  <div class="mute-icon"></div>
-
   <video 
     src="${v}" 
     muted 
@@ -1042,6 +1028,8 @@ function loadTikTokFeed(){
     playsinline
     onclick="toggleMute(this)">
   </video>
+
+  <div class="mute-icon"></div>
 
   <div class="tiktok-info" onclick="openProfileFromFeed('${s.nama}')">
     <b>${s.nama}</b><br>
@@ -1072,25 +1060,6 @@ function loadTikTokFeed(){
   });
 }
 window.addEventListener('load', loadTikTokFeed);
-// TAP VIDEO = MUTE / UNMUTE
-function toggleMute(video){
-
-  // matikan semua video lain
-  document.querySelectorAll('.tiktok-item video').forEach(v=>{
-    if(v !== video){
-      v.muted = true;
-      v.pause();
-      v.currentTime = 0;
-    }
-  });
-
-  // toggle video ini
-  video.muted = !video.muted;
-
-  if(!video.muted){
-    video.play();
-  }
-}
 
 // KLIK INFO = BUKA PROFIL SISWA
 function openProfileFromFeed(nama){
@@ -1154,7 +1123,7 @@ feed.addEventListener('scroll', () => {
 
   tiktokScrollTimer = setTimeout(() => {
     centerClosestVideo();
-  }, 120); // jeda setelah scroll berhenti
+  }, 60); // jeda setelah scroll berhenti
 });
 
 function centerClosestVideo(){
