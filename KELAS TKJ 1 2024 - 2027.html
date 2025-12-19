@@ -330,6 +330,44 @@ footer {
 .slide {
   border-radius: 20px;
 }
+/* ===== TIKTOK STYLE FEED ===== */
+.tiktok-feed{
+  height: 75vh;
+  max-width: 420px;
+  margin: 0 auto;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  border-radius: 20px;
+}
+
+.tiktok-item{
+  height: 75vh;
+  scroll-snap-align: start;
+  position: relative;
+}
+
+.tiktok-item video{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+/* info video */
+.tiktok-info{
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  right: 15px;
+  background: linear-gradient(transparent,rgba(0,0,0,.6));
+  padding: 10px;
+  border-radius: 15px;
+}
+
+.tiktok-info b{
+  font-size: 1rem;
+}
+
 </style>
 </head>
 <body>
@@ -365,6 +403,10 @@ footer {
       <img class="slide" src="2.jpg">
       <img class="slide" src="3.jpg">
     </div>
+    <h3 style="margin-top:30px;">Video Random</h3>
+
+<div class="tiktok-feed" id="tiktokFeed"></div>
+
      <h3 style="margin-top:25px;">Sejarah Singkat Kelas</h3>
   <p>
     Kelas TKJ 1 dibentuk pada tahun 2024, terdiri dari siswa-siswa yang memiliki minat di bidang Teknik Komputer dan Jaringan. 
@@ -869,6 +911,53 @@ setInterval(()=>{
   });
 },3000);
 };
+function loadTikTokFeed(){
+  const feed = document.getElementById('tiktokFeed');
+  feed.innerHTML = '';
+
+  // ambil siswa yang punya video
+  const videoSiswa = siswa.filter(s => s.video && s.video.length);
+
+  // acak urutan
+  videoSiswa.sort(() => Math.random() - 0.5);
+
+  videoSiswa.forEach(s => {
+    s.video.forEach(v => {
+      const item = document.createElement('div');
+      item.className = 'tiktok-item';
+
+      item.innerHTML = `
+        <video src="${v}" muted autoplay loop playsinline></video>
+        <div class="tiktok-info">
+          <b>${s.nama}</b><br>
+          <small>${s.jabatan}</small>
+        </div>
+      `;
+
+      feed.appendChild(item);
+    });
+  });
+
+  // autoplay hanya video yang terlihat
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      const video = e.target.querySelector('video');
+      if(e.isIntersecting){
+        video.play();
+      }else{
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  },{threshold:0.7});
+
+  document.querySelectorAll('.tiktok-item').forEach(item=>{
+    observer.observe(item);
+  });
+}
+
+// panggil saat halaman dibuka
+window.addEventListener('load', loadTikTokFeed);
 </script>
 
 </body>
