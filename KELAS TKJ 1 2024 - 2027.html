@@ -414,42 +414,23 @@ footer {
   outline-offset: -3px;
 }
 
+/* default = mute */
 .mute-icon{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%) scale(0.9);
-
-  width:70px;
-  height:70px;
-  border-radius:50%;
-
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(6px);
-
-  opacity:0;
-  transition:.3s;
-  pointer-events:none;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  opacity:1;
 }
 
 .mute-icon::before{
-  content:'';
-  width:32px;
-  height:32px;
-  background-size:contain;
-  background-repeat:no-repeat;
+  background-image:url('mute.png');
 }
 
-/* MUTE */
-video[muted] + .mute-icon{
-  opacity:1;
+/* SOUND ON */
+video[data-sound] + .mute-icon{
+  opacity:0;
 }
-video[muted] + .mute-icon::before{
-  background-image:url('mute.png');
+
+/* efek fade */
+.mute-icon{
+  transition: opacity .25s ease;
 }
 
 /* SOUND ON */
@@ -689,7 +670,7 @@ const siswa=[
   foto:''},
   {nama:'MUHAMMAD ARIF AJILLA',
   jk:'L',
-  hobi:'HOREG',
+  hobi:'',
   jabatan:'Anggota',
   foto:''},
   {nama:'MUHAMMAD ILHAM FAHRI',
@@ -1073,26 +1054,26 @@ let currentSoundVideo = null;
 // TAP VIDEO = PLAY + UNMUTE, MATIKAN VIDEO LAIN
 function toggleMute(video){
 
-  // jika video ini sedang mute → aktifkan
-  if(video.muted){
-    // matikan semua video lain
-    document.querySelectorAll('.tiktok-item video').forEach(v=>{
-      v.muted = true;
-      v.pause();
-      v.currentTime = 0;
-    });
+  // matikan semua video lain
+  document.querySelectorAll('.tiktok-item video').forEach(v=>{
+    v.muted = true;
+    v.pause();
+    v.currentTime = 0;
+    v.removeAttribute('data-sound');
+  });
 
-    video.muted = false;
-    video.play();
-    currentSoundVideo = video;
-  } 
-  // jika sudah unmute → mute lagi
-  else {
+  // toggle video ini
+  if(video.hasAttribute('data-sound')){
     video.muted = true;
     video.pause();
-    currentSoundVideo = null;
+    video.removeAttribute('data-sound');
+  } else {
+    video.muted = false;
+    video.play();
+    video.setAttribute('data-sound','on');
   }
 }
+
 function enableFullscreenAutoplay(){
   const observer = new IntersectionObserver(entries=>{
     entries.forEach(e=>{
