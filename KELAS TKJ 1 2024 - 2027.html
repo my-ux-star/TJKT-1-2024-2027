@@ -791,7 +791,23 @@ footer {
   <p>By RIFALDI</p>
   <p>© 2025 Kelas TKJ 1 2024-2027</p>
 </footer>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAevvnOL9CXwN32nXRsoJXjCVD8L2054vw",
+  authDomain: "tkj1-feed.firebaseapp.com",
+  databaseURL: "https://tkj1-feed-default-rtdb.firebaseio.com",
+  projectId: "tkj1-feed",
+  storageBucket: "tkj1-feed.firebasestorage.app",
+  messagingSenderId: "1093155012670",
+  appId: "1:1093155012670:web:b43a0ed7b13adb0b77116f"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
 <script>
   /* ===== DATA SISWA (JSON) ===== */
 const siswa=[
@@ -1217,8 +1233,24 @@ setInterval(()=>{
   showSlide(currentSlide);
 },3000);
 };
+function listenLike(videoId, el){
+  if(!el) return;
+  db.ref('likes/' + videoId).on('value', snap=>{
+    el.textContent = snap.val() || 0;
+  });
+}
 function loadTikTokFeed(){
   const feed = document.getElementById('tiktokFeed');
+if(!feed) return;
+  // === SCROLL SNAP FIX (AMAN) ===
+let tiktokScrollTimer = null;
+
+feed.addEventListener('scroll', () => {
+  clearTimeout(tiktokScrollTimer);
+  tiktokScrollTimer = setTimeout(() => {
+    centerClosestVideo();
+  }, 60);
+});
   feed.innerHTML = '';
 
   // ambil siswa yang punya video
@@ -1236,7 +1268,6 @@ feed.innerHTML = `
       const item = document.createElement('div');
       item.className = 'tiktok-item';
 item.dataset.id = s.nama + '_' + v;
-      const store = getStore(item.dataset.id);
 
 item.innerHTML = `
   <video src="${v}" muted loop playsinline></video>
@@ -1261,13 +1292,14 @@ item.innerHTML = `
 
   <!-- ACTION BUTTONS -->
   <div class="action-btns">
-    <div class="like-btn ${store.likes > 0 ? 'active' : ''}">
-      ❤️ <span class="like-count">${store.likes}</span>
-    </div>
-    <div class="comment-btn">
-      💬 <span class="comment-count">${store.comments.length}</span>
-    </div>
+  <div class="like-btn">
+    ❤️ <span class="like-count">0</span>
   </div>
+
+  <div class="comment-btn">
+    💬 <span class="comment-count">0</span>
+  </div>
+</div>
 
   <div class="tiktok-info">
     <div class="tiktok-name">
@@ -1284,7 +1316,16 @@ item.innerHTML = `
     </div>
   </div>
 `;
+const likeCountEl = item.querySelector('.like-count');
+const likeBtnEl = item.querySelector('.like-btn');
 
+if (likeCountEl && likeBtnEl) {
+  listenLike(item.dataset.id, likeCountEl);
+
+  likeBtnEl.onclick = () => {
+    likeVideo(item.dataset.id);
+  };
+}
       feed.appendChild(item);
       const videoEl = item.querySelector('video');
       const soundBtn = item.querySelector('.sound-btn');
@@ -1322,7 +1363,6 @@ videoEl.addEventListener('loadedmetadata', () => {
     videoEl.classList.add('cover');
   }
 });
-      enableFullscreenAutoplay();
     });
   });
 
@@ -1374,18 +1414,6 @@ function enableFullscreenAutoplay(){
   });
 }
 let tiktokScrollTimer = null;
-
-const feed = document.querySelector('.tiktok-feed');
-
-feed.addEventListener('scroll', () => {
-
-  // reset timer tiap scroll
-  clearTimeout(tiktokScrollTimer);
-
-  tiktokScrollTimer = setTimeout(() => {
-    centerClosestVideo();
-  }, 60); // jeda setelah scroll berhenti
-});
 
 function centerClosestVideo(){
 
@@ -1454,30 +1482,6 @@ function saveStore(id,data){
   localStorage.setItem(id, JSON.stringify(data));
 }
 
-document.addEventListener('click', e=>{
-  const item = e.target.closest('.tiktok-item');
-  if(!item) return;
-
-  const videoId = item.dataset.id;
-  const likeBtn = item.querySelector('.like-btn');
-  const likeCount = item.querySelector('.like-count');
-  const commentBtn = item.querySelector('.comment-btn');
-  const commentCount = item.querySelector('.comment-count');
-
-  if(likeBtn && likeBtn.contains(e.target)){
-    let data = getStore(videoId);
-    data.likes++;
-    saveStore(videoId,data);
-    likeCount.textContent = data.likes;
-    likeBtn.classList.add('active');
-  }
-
-  if(commentBtn && commentBtn.contains(e.target)){
-    activeVideoId = videoId;
-    openComment(videoId);
-  }
-});
-
 function openComment(id){
   activeVideoId = id;
   const list = document.getElementById('commentList');
@@ -1514,11 +1518,6 @@ function likeVideo(videoId){
     return (current || 0) + 1;
   });
 }
-function listenLike(videoId, el){
-  db.ref('likes/' + videoId).on('value', snap=>{
-    el.textContent = snap.val() || 0;
-  });
-}
 </script>
 <div id="commentPopup" style="
 display:none;
@@ -1548,39 +1547,5 @@ z-index:99999;
     </button>
   </div>
 </div>
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-<script>
-const firebaseConfig = { 
-
-
-  apiKey : "AIzaSyAevvnOL9CXwN32nXRsoJXjCVD8L2054vw" , 
-
-
-  authDomain : "tkj1-feed.firebaseapp.com" , 
-
-
-  URL basis data : "https://tkj1-feed-default-rtdb.firebaseio.com" , 
-
-
-  ID proyek : "tkj1-feed" , 
-
-
-  storageBucket : "tkj1-feed.firebasestorage.app" , 
-
-
-  messagingSenderId : "1093155012670" , 
-
-
-  ID aplikasi : "1:1093155012670:web:b43a0ed7b13adb0b77116f" 
-
-
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-</script>
 </body>
 </html>
