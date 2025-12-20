@@ -1338,6 +1338,27 @@ item.innerHTML = `
 `;
 
       feed.appendChild(item);
+      const likeCountEl = item.querySelector('.like-count');
+const commentCountEl = item.querySelector('.comment-count');
+
+db.ref('videos/' + item.dataset.id + '/comments')
+  .on('value', snap=>{
+    commentCountEl.textContent = snap.exists()
+      ? snap.numChildren()
+      : 0;
+});
+likeBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+
+  const ref = db.ref(`videos/${item.dataset.id}/likes/${DEVICE_ID}`);
+
+  ref.once('value', snap=>{
+    if(!snap.exists()){
+      ref.set(true);
+      likeBtn.classList.add('active');
+    }
+  });
+});
       const videoEl = item.querySelector('video');
       const soundBtn = item.querySelector('.sound-btn');
 const soundImg = soundBtn.querySelector('img');
@@ -1395,13 +1416,6 @@ videoEl.addEventListener('loadedmetadata', () => {
   document.querySelectorAll('.tiktok-item').forEach(item=>{
     observer.observe(item);
   });
-  const ref = db.ref('videos/' + item.dataset.id);
-
-ref.on('value', snap=>{
-  const data = snap.val() || {};
-  item.querySelector('.like-count').textContent =
-    data.likes ? Object.keys(data.likes).length : 0;
-});
 }
 window.addEventListener('load', loadTikTokFeed);
 
@@ -1543,7 +1557,8 @@ function openComment(id){
   const list = document.getElementById('commentList');
   list.innerHTML = '';
 
-  db.ref('videos/' + id + '/comments').on('value', snap=>{
+  db.ref('videos/' + id + '/comments').off();
+db.ref('videos/' + id + '/comments').on('value', snap=>{
     list.innerHTML = '';
     snap.forEach(c=>{
       const d = c.val();
