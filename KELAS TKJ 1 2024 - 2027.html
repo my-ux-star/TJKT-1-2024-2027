@@ -36,33 +36,34 @@ html, body {
   max-width: 1200px;
   margin: 0 auto;
 }
-  
-/* Slider Beranda 4:3 */
+
 .slider {
-  width: 100%;
-  aspect-ratio: 4 / 3; /* proporsi 4:3 */
-  min-height: 300px;   /* tinggi minimal */
-  max-height: 500px;   /* tinggi maksimal agar tidak terlalu besar di desktop */
   position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 20px;
-  border: 3px solid rgba(255,255,255,0.55);
-  box-shadow:
-    0 12px 35px rgba(0,0,0,0.6),
-    inset 0 0 25px rgba(255,255,255,0.15);
 }
 
 .slide {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;      /* tetap cover */
-  border-radius: 20px;
-  transform: translateX(100%);
+  object-fit: cover;
+
   opacity: 0;
-  transition: transform .6s ease, opacity .6s ease;
+  transform: translateX(100%);
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.slide.prev {
+  transform: translateX(-100%);
 }
 
   .page { display:none; animation:fade .4s ease; }
@@ -198,10 +199,6 @@ html, body {
   width: min(85vw, 300px);
   height: min(85vw, 300px);
 }
-
-.slider {
-  height: min(40vh, 250px); /* lebih tinggi dari default 200px */
-}
   /* Slider Video */
   .slider-video { position: relative; width: 260px; height: 260px; margin: 0 auto; overflow: hidden; border-radius: 20px; }
   .slider-video {
@@ -264,21 +261,6 @@ html, body {
   padding: 20px;
 
   box-shadow: 0 8px 25px rgba(0,0,0,.3);
-}
-.slider {
-  width: 100%;
-  aspect-ratio: 16 / 9; /* bisa diubah misal 4/3 agar lebih tinggi */
-  max-height: 400px;    /* batasi tinggi maksimal agar tidak terlalu besar */
-  border: 3px solid rgba(255,255,255,0.55);
-  box-shadow:
-    0 12px 35px rgba(0,0,0,0.6),
-    inset 0 0 25px rgba(255,255,255,0.15);
-  border-radius: 20px;
-}
-.slide.active {
-  transform: translateX(0);
-  opacity: 1;
-  z-index: 1;
 }
 
 footer {
@@ -649,6 +631,32 @@ footer {
     padding: 7px 12px;
   }
 }
+/* ===== BORDER SLIDER ABOUT ===== */
+#about .slider{
+  border: 3px solid rgba(255,255,255,0.65);
+  border-radius: 22px;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.55),
+    inset 0 0 18px rgba(255,255,255,0.15);
+
+  background: rgba(0,0,0,0.25);
+  padding: 6px; /* jarak border ke foto */
+}
+
+/* biar foto tetap rounded rapi */
+#about .slide{
+  border-radius: 16px;
+}
+/* ===== NAMA DI FULLSCREEN FEED ===== */
+#tiktokFullscreenWrapper.active .tiktok-info{
+  padding: 18px;
+}
+
+#tiktokFullscreenWrapper.active .tiktok-name b{
+  font-size: 1.15rem;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.8);
+}
 </style>
 </head>
 <body>
@@ -784,6 +792,51 @@ footer {
   <p>© 2025 Kelas TKJ 1 2024-2027</p>
 </footer>
 
+  <!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+  const firebaseConfig = {
+
+
+  apiKey: "AIzaSyAevvnOL9CXwN32nXRsoJXjCVD8L2054vw",
+
+
+  authDomain: "tkj1-feed.firebaseapp.com",
+
+
+  databaseURL: "https://tkj1-feed-default-rtdb.firebaseio.com",
+
+
+  projectId: "tkj1-feed",
+
+
+  storageBucket: "tkj1-feed.firebasestorage.app",
+
+
+  messagingSenderId: "1093155012670",
+
+
+  appId: "1:1093155012670:web:b43a0ed7b13adb0b77116f"
+
+
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
+<script>
+function getDeviceId(){
+  let id = localStorage.getItem('device_id');
+  if(!id){
+    id = 'dev_' + Math.random().toString(36).substr(2,9);
+    localStorage.setItem('device_id', id);
+  }
+  return id;
+}
+const DEVICE_ID = getDeviceId();
+</script>
 <script>
   /* ===== DATA SISWA (JSON) ===== */
 const siswa=[
@@ -999,14 +1052,27 @@ const pr=document.getElementById('pr');
 let userMutedVideo = null;
 let currentVideoIndex = 0;
 let videoSlides = [];
+let currentUserName = null;
+
+function getAutoName(){
+  return currentUserName || 'Pengunjung';
+}
 
 function navigate(id){
   stopProfileVideo();
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+
   const page=document.getElementById(id);
   if(page) page.style.display='block';
+
+  // 🔥 TRIGGER ULANG SLIDER
+  if(id === 'about'){
+    setTimeout(()=>{
+      showSlide(currentSlide);
+    },50);
+  }
+
   location.hash=id;
-  menu.style.display='none';
 }
 
 function loadSiswa(){
@@ -1036,6 +1102,8 @@ div.innerHTML = `
 
 function showProfile(s) {
   stopProfileVideo();
+  currentUserName = s.nama;
+localStorage.setItem('current_user', s.nama);
   const profilePage = document.getElementById('profile');
 
   // ===== BACKGROUND =====
@@ -1113,7 +1181,7 @@ function showProfile(s) {
 
   navigate('profile');
 }
-
+currentUserName = localStorage.getItem('current_user');
 function showVideo(index){
   if(!videoSlides.length) return;
 
@@ -1174,44 +1242,32 @@ function openFullscreen(el){
   document.body.appendChild(fs);
 }
 
-window.onload = ()=>{
+window.onload=()=>{
   loadSiswa();
   navigate(location.hash.replace('#','')||'home');
-  initAboutSlider();
   
-// ===== SLIDER ABOUT =====
-function initAboutSlider(){
-  const aboutPage = document.getElementById('about');
-  if(!aboutPage) return;
+  // slider gambar beranda
+ const slides = document.querySelectorAll('.slider .slide');
+let currentSlide = 0;
 
-  const slides = aboutPage.querySelectorAll('.slide');
-  if(slides.length === 0) return;
+function showSlide(index){
+  slides.forEach((slide,i)=>{
+    slide.classList.remove('active','prev');
 
-  let currentSlide = 0;
-
-  slides.forEach((s,i)=>{
-    s.style.transform = i === 0 ? 'translateX(0)' : 'translateX(100%)';
-    s.style.opacity = i === 0 ? '1' : '0';
+    if(i === index){
+      slide.classList.add('active');
+    } else if(i === (index - 1 + slides.length) % slides.length){
+      slide.classList.add('prev');
+    }
   });
-
-  setInterval(()=>{
-    const prev = currentSlide;
-    currentSlide = (currentSlide + 1) % slides.length;
-
-    slides[prev].style.transform = 'translateX(-100%)';
-    slides[prev].style.opacity = '0';
-
-    slides[currentSlide].style.transform = 'translateX(0)';
-    slides[currentSlide].style.opacity = '1';
-
-    slides.forEach((s,i)=>{
-      if(i !== prev && i !== currentSlide){
-        s.style.transform = 'translateX(100%)';
-        s.style.opacity = '0';
-      }
-    });
-  }, 3000);
 }
+
+showSlide(0);
+
+setInterval(()=>{
+  currentSlide = (currentSlide + 1) % slides.length;
+  showSlide(currentSlide);
+},3000);
 };
 function loadTikTokFeed(){
   const feed = document.getElementById('tiktokFeed');
@@ -1232,42 +1288,16 @@ feed.innerHTML = `
       const item = document.createElement('div');
       item.className = 'tiktok-item';
 item.dataset.id = s.nama + '_' + v;
-      item.innerHTML = `
+      const store = getStore(item.dataset.id);
+
+item.innerHTML = `
   <video src="${v}" muted loop playsinline></video>
 
   <!-- AVATAR PROFIL -->
-<div class="feed-avatar" onclick="openProfileFromFeed('${s.nama}')">
-  <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}">
-
-  ${s.verified ? `
-    <span class="verified-badge">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="12" fill="#1da1f2"/>
-        <path d="M9.5 12.8l-2-2a1 1 0 0 1 1.4-1.4l1.3 1.3 4-4a1 1 0 1 1 1.4 1.4l-4.7 4.7a1 1 0 0 1-1.4 0z"
-              fill="#fff"/>
-      </svg>
-    </span>
-  ` : ''}
-</div>
-
-  <!-- TOMBOL SOUND -->
-  <div class="sound-btn">
-    <img src="mute.png">
-  </div>
-<!-- ACTION BUTTONS -->
-<div class="action-btns">
-  <div class="like-btn">
-    ❤️ <span class="like-count">0</span>
-  </div>
-  <div class="comment-btn">
-    💬 <span class="comment-count">0</span>
-  </div>
-</div>
-<div class="tiktok-info">
-  <div class="tiktok-name">
-    <b>${s.nama}</b>
+  <div class="feed-avatar" onclick="openProfileFromFeed('${s.nama}')">
+    <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}">
     ${s.verified ? `
-      <span class="name-verified">
+      <span class="verified-badge">
         <svg viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="12" fill="#1da1f2"/>
           <path d="M9.5 12.8l-2-2a1 1 0 0 1 1.4-1.4l1.3 1.3 4-4a1 1 0 1 1 1.4 1.4l-4.7 4.7a1 1 0 0 1-1.4 0z"
@@ -1276,8 +1306,35 @@ item.dataset.id = s.nama + '_' + v;
       </span>
     ` : ''}
   </div>
-  <small>${s.jabatan}</small>
-</div>
+
+  <div class="sound-btn">
+    <img src="mute.png">
+  </div>
+
+  <!-- ACTION BUTTONS -->
+  <div class="action-btns">
+    <div class="like-btn ${store.likes > 0 ? 'active' : ''}">
+      ❤️ <span class="like-count">${store.likes}</span>
+    </div>
+    <div class="comment-btn">
+      💬 <span class="comment-count">${store.comments.length}</span>
+    </div>
+  </div>
+
+  <div class="tiktok-info">
+    <div class="tiktok-name">
+      <b>${s.nama}</b>
+      ${s.verified ? `
+        <span class="name-verified">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="12" fill="#1da1f2"/>
+            <path d="M9.5 12.8l-2-2a1 1 0 0 1 1.4-1.4l1.3 1.3 4-4a1 1 0 1 1 1.4 1.4l-4.7 4.7a1 1 0 0 1-1.4 0z"
+                  fill="#fff"/>
+          </svg>
+        </span>
+      ` : ''}
+    </div>
+  </div>
 `;
 
       feed.appendChild(item);
@@ -1338,6 +1395,13 @@ videoEl.addEventListener('loadedmetadata', () => {
   document.querySelectorAll('.tiktok-item').forEach(item=>{
     observer.observe(item);
   });
+  const ref = db.ref('videos/' + item.dataset.id);
+
+ref.on('value', snap=>{
+  const data = snap.val() || {};
+  item.querySelector('.like-count').textContent =
+    data.likes ? Object.keys(data.likes).length : 0;
+});
 }
 window.addEventListener('load', loadTikTokFeed);
 
@@ -1461,12 +1525,13 @@ document.addEventListener('click', e=>{
   const commentCount = item.querySelector('.comment-count');
 
   if(likeBtn && likeBtn.contains(e.target)){
-    let data = getStore(videoId);
-    data.likes++;
-    saveStore(videoId,data);
-    likeCount.textContent = data.likes;
-    likeBtn.classList.add('active');
-  }
+  const ref = db.ref(`videos/${videoId}/likes/${DEVICE_ID}`);
+  ref.once('value', snap=>{
+    if(!snap.exists()){
+      ref.set(true); // 1 HP = 1 LIKE
+    }
+  });
+}
 
   if(commentBtn && commentBtn.contains(e.target)){
     activeVideoId = videoId;
@@ -1475,32 +1540,56 @@ document.addEventListener('click', e=>{
 });
 
 function openComment(id){
-  const data = getStore(id);
-  document.getElementById('commentList').innerHTML =
-    data.comments.map(c=>`<div>• ${c}</div>`).join('');
+  const list = document.getElementById('commentList');
+  list.innerHTML = '';
+
+  db.ref('videos/' + id + '/comments').on('value', snap=>{
+    list.innerHTML = '';
+    snap.forEach(c=>{
+      const d = c.val();
+      const t = new Date(d.time).toLocaleString();
+      list.innerHTML += `
+        <div style="margin-bottom:8px">
+          <b>${d.name}</b><br>
+          <small>${t}</small>
+          <div>${d.text}</div>
+        </div>
+      `;
+    });
+  });
+
   document.getElementById('commentPopup').style.display='block';
 }
 
 function closeComment(){
   document.getElementById('commentPopup').style.display='none';
 }
+const badWords = [
+  'anjing','bangsat','kontol','memek','tolol','goblok',
+  'asu','babi','fuck','shit'
+];
 
+function containsBadWord(text){
+  const lower = text.toLowerCase();
+  return badWords.some(word => lower.includes(word));
+}
 function sendComment(){
-  const input = document.getElementById('commentInput');
-  if(!input.value) return;
+  const text = document.getElementById('commentInput').value.trim();
+  if(!text) return alert('Komentar tidak boleh kosong');
 
-  let data = getStore(activeVideoId);
-  data.comments.push(input.value);
-  saveStore(activeVideoId,data);
+  // 🚫 FILTER KATA KASAR
+  if(containsBadWord(text)){
+    return alert('Komentar mengandung kata tidak pantas');
+  }
 
-  input.value='';
-  openComment(activeVideoId);
-
-  document.querySelectorAll('.tiktok-item').forEach(item=>{
-    if(item.dataset.id === activeVideoId){
-      item.querySelector('.comment-count').textContent = data.comments.length;
-    }
+  const ref = db.ref('videos/' + activeVideoId + '/comments');
+  ref.push({
+    name: getAutoName(), // 🔥 otomatis
+    text: text,
+    time: firebase.database.ServerValue.TIMESTAMP
   });
+
+  document.getElementById('commentInput').value='';
 }
 </script>
 <div id="commentPopup" style="
@@ -1519,8 +1608,9 @@ z-index:99999;
   ">
     <h3>Komentar</h3>
     <div id="commentList" style="max-height:260px;overflow:auto;margin:10px 0"></div>
-    <input id="commentInput" placeholder="Tulis komentar..."
-      style="width:100%;padding:10px;border-radius:10px;border:none">
+
+<input id="commentInput" placeholder="Tulis komentar..."
+style="width:100%;padding:10px;border-radius:10px;border:none">
     <button onclick="sendComment()"
       style="margin-top:10px;width:100%;padding:10px;border-radius:10px">
       Kirim
