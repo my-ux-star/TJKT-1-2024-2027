@@ -1240,7 +1240,7 @@ item.dataset.id = s.nama + '_' + v;
 
 item.innerHTML = `
   <video src="${v}" muted loop playsinline></video>
-
+  
   <!-- AVATAR PROFIL -->
   <div class="feed-avatar" onclick="openProfileFromFeed('${s.nama}')">
     <img src="${s.foto || 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png'}">
@@ -1289,7 +1289,6 @@ item.innerHTML = `
       const videoEl = item.querySelector('video');
       const soundBtn = item.querySelector('.sound-btn');
 const soundImg = soundBtn.querySelector('img');
-
 // default: muted
 videoEl.muted = true;
 soundImg.src = 'mute.png';
@@ -1480,9 +1479,16 @@ document.addEventListener('click', e=>{
 });
 
 function openComment(id){
-  const data = getStore(id);
-  document.getElementById('commentList').innerHTML =
-    data.comments.map(c=>`<div>• ${c}</div>`).join('');
+  activeVideoId = id;
+  const list = document.getElementById('commentList');
+
+  db.ref('comments/' + id).on('value', snap=>{
+    list.innerHTML='';
+    snap.forEach(c=>{
+      list.innerHTML += `<div>• ${c.val().text}</div>`;
+    });
+  });
+
   document.getElementById('commentPopup').style.display='block';
 }
 
@@ -1494,17 +1500,23 @@ function sendComment(){
   const input = document.getElementById('commentInput');
   if(!input.value) return;
 
-  let data = getStore(activeVideoId);
-  data.comments.push(input.value);
-  saveStore(activeVideoId,data);
+  db.ref('comments/' + activeVideoId).push({
+    text: input.value,
+    time: Date.now()
+  });
 
   input.value='';
-  openComment(activeVideoId);
+}
+function likeVideo(videoId){
+  const ref = db.ref('likes/' + videoId);
 
-  document.querySelectorAll('.tiktok-item').forEach(item=>{
-    if(item.dataset.id === activeVideoId){
-      item.querySelector('.comment-count').textContent = data.comments.length;
-    }
+  ref.transaction(current => {
+    return (current || 0) + 1;
+  });
+}
+function listenLike(videoId, el){
+  db.ref('likes/' + videoId).on('value', snap=>{
+    el.textContent = snap.val() || 0;
   });
 }
 </script>
@@ -1536,5 +1548,39 @@ z-index:99999;
     </button>
   </div>
 </div>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = { 
+
+
+  apiKey : "AIzaSyAevvnOL9CXwN32nXRsoJXjCVD8L2054vw" , 
+
+
+  authDomain : "tkj1-feed.firebaseapp.com" , 
+
+
+  URL basis data : "https://tkj1-feed-default-rtdb.firebaseio.com" , 
+
+
+  ID proyek : "tkj1-feed" , 
+
+
+  storageBucket : "tkj1-feed.firebasestorage.app" , 
+
+
+  messagingSenderId : "1093155012670" , 
+
+
+  ID aplikasi : "1:1093155012670:web:b43a0ed7b13adb0b77116f" 
+
+
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
 </body>
 </html>
