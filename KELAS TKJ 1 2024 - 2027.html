@@ -792,51 +792,6 @@ footer {
   <p>© 2025 Kelas TKJ 1 2024-2027</p>
 </footer>
 
-  <!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-<script>
-  const firebaseConfig = {
-
-
-  apiKey: "AIzaSyAevvnOL9CXwN32nXRsoJXjCVD8L2054vw",
-
-
-  authDomain: "tkj1-feed.firebaseapp.com",
-
-
-  databaseURL: "https://tkj1-feed-default-rtdb.firebaseio.com",
-
-
-  projectId: "tkj1-feed",
-
-
-  storageBucket: "tkj1-feed.firebasestorage.app",
-
-
-  messagingSenderId: "1093155012670",
-
-
-  appId: "1:1093155012670:web:b43a0ed7b13adb0b77116f"
-
-
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-</script>
-<script>
-function getDeviceId(){
-  let id = localStorage.getItem('device_id');
-  if(!id){
-    id = 'dev_' + Math.random().toString(36).substr(2,9);
-    localStorage.setItem('device_id', id);
-  }
-  return id;
-}
-const DEVICE_ID = getDeviceId();
-</script>
 <script>
   /* ===== DATA SISWA (JSON) ===== */
 const siswa=[
@@ -1052,11 +1007,6 @@ const pr=document.getElementById('pr');
 let userMutedVideo = null;
 let currentVideoIndex = 0;
 let videoSlides = [];
-let currentUserName = null;
-
-function getAutoName(){
-  return currentUserName || 'Pengunjung';
-}
 
 function navigate(id){
   stopProfileVideo();
@@ -1102,8 +1052,6 @@ div.innerHTML = `
 
 function showProfile(s) {
   stopProfileVideo();
-  currentUserName = s.nama;
-localStorage.setItem('current_user', s.nama);
   const profilePage = document.getElementById('profile');
 
   // ===== BACKGROUND =====
@@ -1181,7 +1129,7 @@ localStorage.setItem('current_user', s.nama);
 
   navigate('profile');
 }
-currentUserName = localStorage.getItem('current_user');
+
 function showVideo(index){
   if(!videoSlides.length) return;
 
@@ -1338,27 +1286,6 @@ item.innerHTML = `
 `;
 
       feed.appendChild(item);
-      const likeCountEl = item.querySelector('.like-count');
-const commentCountEl = item.querySelector('.comment-count');
-
-db.ref('videos/' + item.dataset.id + '/comments')
-  .on('value', snap=>{
-    commentCountEl.textContent = snap.exists()
-      ? snap.numChildren()
-      : 0;
-});
-likeBtn.addEventListener('click', (e)=>{
-  e.stopPropagation();
-
-  const ref = db.ref(`videos/${item.dataset.id}/likes/${DEVICE_ID}`);
-
-  ref.once('value', snap=>{
-    if(!snap.exists()){
-      ref.set(true);
-      likeBtn.classList.add('active');
-    }
-  });
-});
       const videoEl = item.querySelector('video');
       const soundBtn = item.querySelector('.sound-btn');
 const soundImg = soundBtn.querySelector('img');
@@ -1539,13 +1466,12 @@ document.addEventListener('click', e=>{
   const commentCount = item.querySelector('.comment-count');
 
   if(likeBtn && likeBtn.contains(e.target)){
-  const ref = db.ref(`videos/${videoId}/likes/${DEVICE_ID}`);
-  ref.once('value', snap=>{
-    if(!snap.exists()){
-      ref.set(true); // 1 HP = 1 LIKE
-    }
-  });
-}
+    let data = getStore(videoId);
+    data.likes++;
+    saveStore(videoId,data);
+    likeCount.textContent = data.likes;
+    likeBtn.classList.add('active');
+  }
 
   if(commentBtn && commentBtn.contains(e.target)){
     activeVideoId = videoId;
@@ -1554,57 +1480,32 @@ document.addEventListener('click', e=>{
 });
 
 function openComment(id){
-  const list = document.getElementById('commentList');
-  list.innerHTML = '';
-
-  db.ref('videos/' + id + '/comments').off();
-db.ref('videos/' + id + '/comments').on('value', snap=>{
-    list.innerHTML = '';
-    snap.forEach(c=>{
-      const d = c.val();
-      const t = new Date(d.time).toLocaleString();
-      list.innerHTML += `
-        <div style="margin-bottom:8px">
-          <b>${d.name}</b><br>
-          <small>${t}</small>
-          <div>${d.text}</div>
-        </div>
-      `;
-    });
-  });
-
+  const data = getStore(id);
+  document.getElementById('commentList').innerHTML =
+    data.comments.map(c=>`<div>• ${c}</div>`).join('');
   document.getElementById('commentPopup').style.display='block';
 }
 
 function closeComment(){
   document.getElementById('commentPopup').style.display='none';
 }
-const badWords = [
-  'anjing','bangsat','kontol','memek','tolol','goblok',
-  'asu','babi','fuck','shit'
-];
 
-function containsBadWord(text){
-  const lower = text.toLowerCase();
-  return badWords.some(word => lower.includes(word));
-}
 function sendComment(){
-  const text = document.getElementById('commentInput').value.trim();
-  if(!text) return alert('Komentar tidak boleh kosong');
+  const input = document.getElementById('commentInput');
+  if(!input.value) return;
 
-  // 🚫 FILTER KATA KASAR
-  if(containsBadWord(text)){
-    return alert('Komentar mengandung kata tidak pantas');
-  }
+  let data = getStore(activeVideoId);
+  data.comments.push(input.value);
+  saveStore(activeVideoId,data);
 
-  const ref = db.ref('videos/' + activeVideoId + '/comments');
-  ref.push({
-    name: getAutoName(), // 🔥 otomatis
-    text: text,
-    time: firebase.database.ServerValue.TIMESTAMP
+  input.value='';
+  openComment(activeVideoId);
+
+  document.querySelectorAll('.tiktok-item').forEach(item=>{
+    if(item.dataset.id === activeVideoId){
+      item.querySelector('.comment-count').textContent = data.comments.length;
+    }
   });
-
-  document.getElementById('commentInput').value='';
 }
 </script>
 <div id="commentPopup" style="
@@ -1623,9 +1524,8 @@ z-index:99999;
   ">
     <h3>Komentar</h3>
     <div id="commentList" style="max-height:260px;overflow:auto;margin:10px 0"></div>
-
-<input id="commentInput" placeholder="Tulis komentar..."
-style="width:100%;padding:10px;border-radius:10px;border:none">
+    <input id="commentInput" placeholder="Tulis komentar..."
+      style="width:100%;padding:10px;border-radius:10px;border:none">
     <button onclick="sendComment()"
       style="margin-top:10px;width:100%;padding:10px;border-radius:10px">
       Kirim
