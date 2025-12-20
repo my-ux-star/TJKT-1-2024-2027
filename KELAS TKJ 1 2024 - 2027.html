@@ -1174,38 +1174,44 @@ function openFullscreen(el){
   document.body.appendChild(fs);
 }
 
-window.onload=()=>{
+window.onload = ()=>{
   loadSiswa();
   navigate(location.hash.replace('#','')||'home');
+  initAboutSlider();
   
-  // slider gambar beranda
- const slides = document.querySelectorAll('.slide');
-let currentSlide = 0;
+// ===== SLIDER ABOUT =====
+function initAboutSlider(){
+  const aboutPage = document.getElementById('about');
+  if(!aboutPage) return;
 
-// tampilkan slide pertama
-slides[0].style.transform = 'translateX(0)';
-slides[0].style.opacity = '1';
+  const slides = aboutPage.querySelectorAll('.slide');
+  if(slides.length === 0) return;
 
-setInterval(()=>{
-  const prev = currentSlide;
-  currentSlide = (currentSlide + 1) % slides.length;
+  let currentSlide = 0;
 
-  // slide lama keluar ke kiri
-  slides[prev].style.transform = 'translateX(-100%)';
-  slides[prev].style.opacity = '0';
-
-  // slide baru masuk dari kanan
-  slides[currentSlide].style.transform = 'translateX(0)';
-  slides[currentSlide].style.opacity = '1';
-
-  // reset slide lain
   slides.forEach((s,i)=>{
-    if(i !== prev && i !== currentSlide){
-      s.style.transform = 'translateX(100%)';
-      s.style.opacity = '0';
-    }
+    s.style.transform = i === 0 ? 'translateX(0)' : 'translateX(100%)';
+    s.style.opacity = i === 0 ? '1' : '0';
   });
-},3000);
+
+  setInterval(()=>{
+    const prev = currentSlide;
+    currentSlide = (currentSlide + 1) % slides.length;
+
+    slides[prev].style.transform = 'translateX(-100%)';
+    slides[prev].style.opacity = '0';
+
+    slides[currentSlide].style.transform = 'translateX(0)';
+    slides[currentSlide].style.opacity = '1';
+
+    slides.forEach((s,i)=>{
+      if(i !== prev && i !== currentSlide){
+        s.style.transform = 'translateX(100%)';
+        s.style.opacity = '0';
+      }
+    });
+  }, 3000);
+}
 };
 function loadTikTokFeed(){
   const feed = document.getElementById('tiktokFeed');
