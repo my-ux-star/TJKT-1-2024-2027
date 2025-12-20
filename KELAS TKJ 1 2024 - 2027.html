@@ -1264,9 +1264,6 @@ item.innerHTML = `
     <div class="like-btn ${store.likes > 0 ? 'active' : ''}">
       ❤️ <span class="like-count">${store.likes}</span>
     </div>
-    <div class="comment-btn">
-      💬 <span class="comment-count">${store.comments.length}</span>
-    </div>
   </div>
 
   <div class="tiktok-info">
@@ -1445,7 +1442,6 @@ function toggleFeedFullscreen(){
   // biar video tengah langsung update
   setTimeout(centerClosestVideo, 200);
 }
-let activeVideoId = null;
 
 function getStore(id){
   return JSON.parse(localStorage.getItem(id)) || {likes:0, comments:[]};
@@ -1472,69 +1468,7 @@ document.addEventListener('click', e=>{
     likeCount.textContent = data.likes;
     likeBtn.classList.add('active');
   }
-
-  if(commentBtn && commentBtn.contains(e.target)){
-    activeVideoId = videoId;
-    openComment(videoId);
-  }
 });
-
-function openComment(id){
-  const data = getStore(id);
-  document.getElementById('commentList').innerHTML =
-    data.comments.map(c=>`<div>• ${c}</div>`).join('');
-  document.getElementById('commentPopup').style.display='block';
-}
-
-function closeComment(){
-  document.getElementById('commentPopup').style.display='none';
-}
-
-function sendComment(){
-  const input = document.getElementById('commentInput');
-  if(!input.value) return;
-
-  let data = getStore(activeVideoId);
-  data.comments.push(input.value);
-  saveStore(activeVideoId,data);
-
-  input.value='';
-  openComment(activeVideoId);
-
-  document.querySelectorAll('.tiktok-item').forEach(item=>{
-    if(item.dataset.id === activeVideoId){
-      item.querySelector('.comment-count').textContent = data.comments.length;
-    }
-  });
-}
 </script>
-<div id="commentPopup" style="
-display:none;
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.75);
-z-index:99999;
-">
-  <div style="
-  background:#111;
-  max-width:420px;
-  margin:80px auto;
-  border-radius:16px;
-  padding:16px;
-  ">
-    <h3>Komentar</h3>
-    <div id="commentList" style="max-height:260px;overflow:auto;margin:10px 0"></div>
-    <input id="commentInput" placeholder="Tulis komentar..."
-      style="width:100%;padding:10px;border-radius:10px;border:none">
-    <button onclick="sendComment()"
-      style="margin-top:10px;width:100%;padding:10px;border-radius:10px">
-      Kirim
-    </button>
-    <button onclick="closeComment()"
-      style="margin-top:8px;width:100%;padding:8px;border-radius:10px">
-      Tutup
-    </button>
-  </div>
-</div>
 </body>
 </html>
